@@ -1,0 +1,255 @@
+<!DOCTYPE html><html lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>AI Alarm List</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "outline": "#817662",
+                    "surface-container": "#eeedf3",
+                    "secondary-container": "#e2e2e2",
+                    "on-tertiary-fixed-variant": "#45474b",
+                    "on-primary-fixed": "#261a00",
+                    "secondary-fixed": "#e2e2e2",
+                    "inverse-primary": "#f6be39",
+                    "on-surface-variant": "#4f4634",
+                    "on-surface": "#1a1b1f",
+                    "inverse-surface": "#2f3034",
+                    "outline-variant": "#d3c5ae",
+                    "on-primary-fixed-variant": "#5c4300",
+                    "on-tertiary-fixed": "#1a1c1f",
+                    "primary-fixed-dim": "#f6be39",
+                    "secondary": "#5e5e5e",
+                    "primary": "#795900",
+                    "background": "#faf9fe",
+                    "on-tertiary": "#ffffff",
+                    "on-secondary-container": "#646464",
+                    "on-secondary": "#ffffff",
+                    "on-secondary-fixed-variant": "#474747",
+                    "surface-container-low": "#f4f3f8",
+                    "on-tertiary-container": "#3b3d41",
+                    "on-background": "#1a1b1f",
+                    "secondary-fixed-dim": "#c6c6c6",
+                    "tertiary-fixed-dim": "#c6c6cb",
+                    "on-primary-container": "#503a00",
+                    "error": "#ba1a1a",
+                    "surface-tint": "#795900",
+                    "inverse-on-surface": "#f1f0f5",
+                    "surface-dim": "#dad9df",
+                    "primary-fixed": "#ffdfa0",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "surface": "#faf9fe",
+                    "error-container": "#ffdad6",
+                    "surface-bright": "#faf9fe",
+                    "on-error-container": "#93000a",
+                    "on-primary": "#ffffff",
+                    "tertiary-fixed": "#e2e2e7",
+                    "surface-container-high": "#e9e7ed",
+                    "surface-container-highest": "#e3e2e7",
+                    "tertiary-container": "#a7a8ad",
+                    "on-error": "#ffffff",
+                    "tertiary": "#5d5e63",
+                    "primary-container": "#d4a017",
+                    "surface-container-lowest": "#ffffff",
+                    "surface-variant": "#e3e2e7"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-sm": "8px",
+                    "margin-desktop": "32px",
+                    "unit": "4px",
+                    "gutter": "12px",
+                    "stack-lg": "24px",
+                    "stack-md": "16px",
+                    "margin-mobile": "16px"
+            },
+            "fontFamily": {
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "display-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["17px", {"lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "label-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0", "fontWeight": "500"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["15px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+          font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .material-symbols-outlined.filled {
+          font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom iOS Switch styling for earth yellow accent */
+        .ios-switch:checked {
+            background-color: #D4A017;
+            border-color: #D4A017;
+        }
+        .ios-switch:checked:focus {
+            --tw-ring-color: #D4A017;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background font-body-lg min-h-screen pb-24 md:pb-0 flex flex-col">
+<!-- TopAppBar -->
+<header class="w-full sticky top-0 z-50 bg-background dark:bg-background">
+<div class="flex justify-between items-center px-margin-mobile py-stack-md max-w-[1024px] mx-auto">
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-semibold text-on-surface text-body-lg tracking-tight">chronos</h1>
+<button class="w-8 h-8 rounded-full overflow-hidden hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<img alt="User profile photo" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAAbYvzHm7wWztJFWIoxV_pQYlXduOfECwtcxwVBs7TW-pJIuA2K_A_lQSD9bd-UuUMJki-1QGlpkkiMLOhepAS71wnISjCQOWVx-vhFTH9CwteMeSH0VljWzlLoi09sWthXnE2LARLAQACDBzernOgWAiuxZX5-sFFjlL3FwFg3OaY9J8b0Oxra-4ZaVIP8lJlQbVivydoLD-dUaImk6SKdcLCDPGHNh6P9oPtqNTeGoj2_1gx8kh241pSghvN7mgazR6a7hcmfD0">
+</button>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-grow w-full max-w-[1024px] mx-auto px-margin-mobile flex flex-col pt-stack-md">
+<!-- Header Section -->
+<div class="flex justify-between items-end mb-stack-lg">
+<h2 class="font-display-lg-mobile md:font-display-lg text-on-background">Alarms</h2>
+<button class="text-primary-container font-label-caps p-2 active:scale-95 transition-transform">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<!-- Alarm List (iOS Style) -->
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden">
+<!-- Alarm Item 1 -->
+<div class="flex items-center justify-between p-margin-mobile border-b border-surface-container-highest last:border-b-0 active:bg-[#E5E5EA] transition-colors cursor-pointer group">
+<div class="flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg-mobile md:font-display-lg text-on-surface">6:30</span>
+<span class="font-body-lg text-on-surface-variant">AM</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-label-sm text-on-surface-variant">Morning Routine</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-container text-white font-label-caps text-[10px]">AI SMART</span>
+</div>
+</div>
+<div class="flex items-center" onclick="event.stopPropagation();">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer ios-switch" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+<!-- Alarm Item 2 -->
+<div class="flex items-center justify-between p-margin-mobile border-b border-surface-container-highest last:border-b-0 active:bg-[#E5E5EA] transition-colors cursor-pointer group">
+<div class="flex flex-col">
+<div class="flex items-baseline gap-2 opacity-50">
+<span class="font-display-lg-mobile md:font-display-lg text-on-surface">7:00</span>
+<span class="font-body-lg text-on-surface-variant">AM</span>
+</div>
+<div class="flex items-center gap-2 mt-1 opacity-50">
+<span class="font-label-sm text-on-surface-variant">Commute Warning</span>
+</div>
+</div>
+<div class="flex items-center" onclick="event.stopPropagation();">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer ios-switch" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+<!-- Alarm Item 3 -->
+<div class="flex items-center justify-between p-margin-mobile border-b border-surface-container-highest last:border-b-0 active:bg-[#E5E5EA] transition-colors cursor-pointer group">
+<div class="flex flex-col">
+<div class="flex items-baseline gap-2">
+<span class="font-display-lg-mobile md:font-display-lg text-on-surface">12:15</span>
+<span class="font-body-lg text-on-surface-variant">PM</span>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<span class="font-label-sm text-on-surface-variant">Lunch Sync</span>
+<span class="px-2 py-0.5 rounded-full bg-primary-container text-white font-label-caps text-[10px]">AI SMART</span>
+</div>
+</div>
+<div class="flex items-center" onclick="event.stopPropagation();">
+<label class="relative inline-flex items-center cursor-pointer">
+<input checked="" class="sr-only peer ios-switch" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+<!-- Alarm Item 4 -->
+<div class="flex items-center justify-between p-margin-mobile border-b border-surface-container-highest last:border-b-0 active:bg-[#E5E5EA] transition-colors cursor-pointer group">
+<div class="flex flex-col">
+<div class="flex items-baseline gap-2 opacity-50">
+<span class="font-display-lg-mobile md:font-display-lg text-on-surface">5:00</span>
+<span class="font-body-lg text-on-surface-variant">PM</span>
+</div>
+<div class="flex items-center gap-2 mt-1 opacity-50">
+<span class="font-label-sm text-on-surface-variant">Wrap Up</span>
+</div>
+</div>
+<div class="flex items-center" onclick="event.stopPropagation();">
+<label class="relative inline-flex items-center cursor-pointer">
+<input class="sr-only peer ios-switch" type="checkbox" value="">
+<div class="w-11 h-6 bg-surface-container-highest peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-container"></div>
+</label>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (Mobile Only) -->
+<nav class="md:hidden fixed bottom-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-[0px_-1px_0px_0px_rgba(0,0,0,0.05)]">
+<div class="flex justify-around items-center pt-2 pb-safe px-margin-mobile">
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-sm text-label-sm mt-1">Calendar</span>
+</button>
+<button class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-semibold hover:text-primary-container active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined filled" data-icon="alarm">alarm</span>
+<span class="font-label-sm text-label-sm mt-1">Alarms</span>
+</button>
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-transform duration-150">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+<span class="font-label-sm text-label-sm mt-1">Tasks</span>
+</button>
+</div>
+</nav>
+<!-- Desktop Navigation Cluster (Hidden on Mobile) -->
+<nav class="hidden md:flex fixed right-margin-desktop top-[20px] z-50 gap-gutter">
+<button class="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-secondary hover:bg-surface-container hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-sm">Calendar</span>
+</button>
+<button class="flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-surface-container text-primary font-semibold hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined filled" data-icon="alarm">alarm</span>
+<span class="font-label-sm">Alarms</span>
+</button>
+<button class="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-secondary hover:bg-surface-container hover:text-primary-container transition-colors">
+<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span>
+<span class="font-label-sm">Tasks</span>
+</button>
+</nav>
+</body></html>

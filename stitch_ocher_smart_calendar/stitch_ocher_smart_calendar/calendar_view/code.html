@@ -1,0 +1,301 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Aurelian Calendar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "outline": "#817662",
+                      "surface-container": "#eeedf3",
+                      "secondary-container": "#e2e2e2",
+                      "on-tertiary-fixed-variant": "#45474b",
+                      "on-primary-fixed": "#261a00",
+                      "secondary-fixed": "#e2e2e2",
+                      "inverse-primary": "#f6be39",
+                      "on-surface-variant": "#4f4634",
+                      "on-surface": "#1a1b1f",
+                      "inverse-surface": "#2f3034",
+                      "outline-variant": "#d3c5ae",
+                      "on-primary-fixed-variant": "#5c4300",
+                      "on-tertiary-fixed": "#1a1c1f",
+                      "primary-fixed-dim": "#f6be39",
+                      "secondary": "#5e5e5e",
+                      "primary": "#795900",
+                      "background": "#faf9fe",
+                      "on-tertiary": "#ffffff",
+                      "on-secondary-container": "#646464",
+                      "on-secondary": "#ffffff",
+                      "on-secondary-fixed-variant": "#474747",
+                      "surface-container-low": "#f4f3f8",
+                      "on-tertiary-container": "#3b3d41",
+                      "on-background": "#1a1b1f",
+                      "secondary-fixed-dim": "#c6c6c6",
+                      "tertiary-fixed-dim": "#c6c6cb",
+                      "on-primary-container": "#503a00",
+                      "error": "#ba1a1a",
+                      "surface-tint": "#795900",
+                      "inverse-on-surface": "#f1f0f5",
+                      "surface-dim": "#dad9df",
+                      "primary-fixed": "#ffdfa0",
+                      "on-secondary-fixed": "#1b1b1b",
+                      "surface": "#faf9fe",
+                      "error-container": "#ffdad6",
+                      "surface-bright": "#faf9fe",
+                      "on-error-container": "#93000a",
+                      "on-primary": "#ffffff",
+                      "tertiary-fixed": "#e2e2e7",
+                      "surface-container-high": "#e9e7ed",
+                      "surface-container-highest": "#e3e2e7",
+                      "tertiary-container": "#a7a8ad",
+                      "on-error": "#ffffff",
+                      "tertiary": "#5d5e63",
+                      "primary-container": "#d4a017",
+                      "surface-container-lowest": "#ffffff",
+                      "surface-variant": "#e3e2e7"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.25rem",
+                      "lg": "0.5rem",
+                      "xl": "0.75rem",
+                      "full": "9999px"
+              },
+              "spacing": {
+                      "stack-sm": "8px",
+                      "margin-desktop": "32px",
+                      "unit": "4px",
+                      "gutter": "12px",
+                      "stack-lg": "24px",
+                      "stack-md": "16px",
+                      "margin-mobile": "16px"
+              },
+              "fontFamily": {
+                      "display-lg": [
+                              "Inter"
+                      ],
+                      "body-lg": [
+                              "Inter"
+                      ],
+                      "label-sm": [
+                              "Inter"
+                      ],
+                      "label-caps": [
+                              "Inter"
+                      ],
+                      "body-sm": [
+                              "Inter"
+                      ],
+                      "headline-md": [
+                              "Inter"
+                      ],
+                      "display-lg-mobile": [
+                              "Inter"
+                      ]
+              },
+              "fontSize": {
+                      "display-lg": [
+                              "34px",
+                              {
+                                      "lineHeight": "41px",
+                                      "letterSpacing": "-0.02em",
+                                      "fontWeight": "700"
+                              }
+                      ],
+                      "body-lg": [
+                              "17px",
+                              {
+                                      "lineHeight": "22px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "label-sm": [
+                              "13px",
+                              {
+                                      "lineHeight": "18px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "500"
+                              }
+                      ],
+                      "label-caps": [
+                              "12px",
+                              {
+                                      "lineHeight": "16px",
+                                      "letterSpacing": "0.05em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "body-sm": [
+                              "15px",
+                              {
+                                      "lineHeight": "20px",
+                                      "letterSpacing": "0",
+                                      "fontWeight": "400"
+                              }
+                      ],
+                      "headline-md": [
+                              "22px",
+                              {
+                                      "lineHeight": "28px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "600"
+                              }
+                      ],
+                      "display-lg-mobile": [
+                              "28px",
+                              {
+                                      "lineHeight": "34px",
+                                      "letterSpacing": "-0.01em",
+                                      "fontWeight": "700"
+                              }
+                      ]
+              }
+      },
+          },
+        }
+      </script>
+<style>
+          body {
+              background-color: #F2F2F7;
+          }
+      </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-[#F2F2F7] text-on-surface font-body-sm min-h-screen pb-[100px]">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-background w-full sticky top-0 z-50 flat no shadows">
+<div class="flex justify-between items-center px-margin-mobile py-stack-md max-w-[1024px] mx-auto bg-background dark:bg-background">
+<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined text-primary dark:text-primary-fixed-dim text-2xl">menu</span>
+</button>
+<h1 class="font-semibold text-on-surface tracking-tight text-body-lg">chronos</h1>
+<button class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200 w-8 h-8 rounded-full overflow-hidden">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="A close up portrait of a professional individual with a warm smile, set against a solid, neutral gray background. The lighting is soft and flattering, typical of a high-end corporate headshot. They are wearing modern, minimalist clothing." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBdhPSJNX4GbdO95ftqvITgV3rZ9w2nZbRb3-bYiNQGdFRSkLKLx6GL0P1BOroFbQCaR083Zx2c3c8AJXBPA2dbPieinty4_GcxwRPJT4hYrBSrBlJFvAFvwPeFjIhZim96WWK-1nZSZgDOVwH55xTEwPrtQwrGa5Jog3L-AWOwxBAuUg3ODKc3p3aOvHndVyEUYignWtU84uLiXjbkDGAVark2vMB730COWKA7-U9y20RkCzK-0-P-ZI6bMH1_nzmGLnkOiMjZPX4">
+</button>
+</div>
+</header>
+<main class="max-w-[1024px] mx-auto px-margin-mobile md:px-margin-desktop mt-stack-md flex flex-col gap-stack-lg">
+<!-- Calendar Section -->
+<section class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden">
+<div class="p-stack-md border-b border-surface-variant flex justify-between items-center">
+<h2 class="font-headline-md text-headline-md text-on-surface">October 2023</h2>
+<div class="flex gap-gutter">
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors"><span class="material-symbols-outlined text-on-surface-variant">chevron_left</span></button>
+<button class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-surface-variant transition-colors"><span class="material-symbols-outlined text-on-surface-variant">chevron_right</span></button>
+</div>
+</div>
+<div class="p-stack-md">
+<!-- Days of Week -->
+<div class="grid grid-cols-7 gap-1 mb-stack-sm text-center">
+<div class="font-label-caps text-label-caps text-on-surface-variant">SUN</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">MON</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">TUE</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">WED</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">THU</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">FRI</div>
+<div class="font-label-caps text-label-caps text-on-surface-variant">SAT</div>
+</div>
+<!-- Calendar Grid -->
+<div class="grid grid-cols-7 gap-y-2 gap-x-1 text-center font-body-lg text-body-lg">
+<!-- Week 1 -->
+<div class="text-on-surface-variant/50 py-2">1</div>
+<div class="py-2">2</div>
+<div class="py-2">3</div>
+<div class="py-2">4</div>
+<div class="py-2">5</div>
+<div class="py-2">6</div>
+<div class="py-2">7</div>
+<!-- Week 2 -->
+<div class="py-2">8</div>
+<div class="py-2">9</div>
+<div class="py-2">10</div>
+<div class="py-2">11</div>
+<div class="py-2">12</div>
+<div class="py-2">13</div>
+<div class="py-2">14</div>
+<!-- Week 3 -->
+<div class="py-2">15</div>
+<div class="py-2">16</div>
+<div class="py-2 flex justify-center"><div class="w-8 h-8 rounded-full bg-primary-container text-on-primary flex items-center justify-center">17</div></div> <!-- Today Highlighted -->
+<div class="py-2">18</div>
+<div class="py-2">19</div>
+<div class="py-2">20</div>
+<div class="py-2">21</div>
+<!-- Week 4 -->
+<div class="py-2">22</div>
+<div class="py-2">23</div>
+<div class="py-2">24</div>
+<div class="py-2">25</div>
+<div class="py-2">26</div>
+<div class="py-2">27</div>
+<div class="py-2">28</div>
+<!-- Week 5 -->
+<div class="py-2">29</div>
+<div class="py-2">30</div>
+<div class="py-2">31</div>
+<div class="text-on-surface-variant/50 py-2">1</div>
+<div class="text-on-surface-variant/50 py-2">2</div>
+<div class="text-on-surface-variant/50 py-2">3</div>
+<div class="text-on-surface-variant/50 py-2">4</div>
+</div>
+</div>
+</section>
+<!-- Events List -->
+<section class="flex flex-col gap-stack-sm">
+<h3 class="font-headline-md text-headline-md text-on-surface px-unit">Events for Oct 17</h3>
+<div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+<!-- Event Item 1 -->
+<div class="flex items-center p-stack-md border-b border-surface-variant active:scale-[0.98] active:bg-[#E5E5EA] transition-all cursor-pointer min-h-[44px]"><div class="flex-1"><h4 class="font-body-lg text-body-lg text-on-surface font-medium">Design Sync</h4></div><div class="text-right ml-stack-md shrink-0"><p class="font-body-lg text-body-lg text-on-surface-variant">10:00 - 11:30 AM</p></div></div>
+<!-- Event Item 2 -->
+<div class="flex items-center p-stack-md border-b border-surface-variant active:scale-[0.98] active:bg-[#E5E5EA] transition-all cursor-pointer min-h-[44px]"><div class="flex-1"><h4 class="font-body-lg text-body-lg text-on-surface font-medium">Lunch with Client</h4></div><div class="text-right ml-stack-md shrink-0"><p class="font-body-lg text-body-lg text-on-surface-variant">12:30 - 1:30 PM</p></div></div>
+<!-- Event Item 3 -->
+<div class="flex items-center p-stack-md active:scale-[0.98] active:bg-[#E5E5EA] transition-all cursor-pointer min-h-[44px]"><div class="flex-1"><h4 class="font-body-lg text-body-lg text-on-surface font-medium">Weekly Review</h4></div><div class="text-right ml-stack-md shrink-0"><p class="font-body-lg text-body-lg text-on-surface-variant">3:00 - 4:00 PM</p></div></div>
+</div>
+</section><section class="flex flex-col gap-stack-sm mt-stack-md">
+  <h3 class="font-headline-md text-headline-md text-on-surface px-unit">Todo</h3>
+  <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden flex flex-col">
+    <!-- Todo Item 1 -->
+    <div class="flex items-center p-stack-md active:scale-[0.98] active:bg-[#E5E5EA] transition-all cursor-pointer min-h-[44px]">
+      <div class="flex-1">
+        <h4 class="font-body-lg text-body-lg text-on-surface font-medium">Submit Report</h4>
+      </div>
+      <div class="text-right ml-stack-md shrink-0">
+        <p class="font-body-lg text-body-lg text-on-surface-variant">5:00 PM</p>
+      </div>
+    </div>
+  </div>
+</section>
+<button class="fixed bottom-[90px] right-margin-mobile w-14 h-14 bg-primary-container rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform duration-200 z-40 md:hidden">
+<span class="material-symbols-outlined text-on-primary" data-icon="add">add</span>
+</button></main>
+<!-- BottomNavBar -->
+<nav class="md:hidden bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md fixed bottom-0 w-full z-50 shadow-[0px_-1px_0px_0px_rgba(0,0,0,0.05)] bg-surface dark:bg-surface-dim">
+<div class="flex justify-around items-center pt-2 pb-safe px-margin-mobile h-[60px]">
+<!-- Calendar (Active) -->
+<button class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-semibold hover:text-primary-container active:scale-90 transition-transform duration-150 w-[72px]">
+<span class="material-symbols-outlined text-[24px] mb-1" style="font-variation-settings: &quot;FILL&quot; 1;">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</button>
+<!-- Alarms (Inactive) -->
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-transform duration-150 w-[72px]">
+<span class="material-symbols-outlined text-[24px] mb-1">alarm</span>
+<span class="font-label-sm text-label-sm">Alarms</span>
+</button>
+<!-- Tasks (Inactive) -->
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-transform duration-150 w-[72px]">
+<span class="material-symbols-outlined text-[24px] mb-1">check_circle</span>
+<span class="font-label-sm text-label-sm">Tasks</span>
+</button>
+</div>
+</nav>
+</body></html>

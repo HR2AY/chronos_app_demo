@@ -1,0 +1,4 @@
+python-dotenv>=1.1,<2
+livekit-agents>=1.2,<2
+livekit-plugins-openai>=1.2,<2
+livekit-plugins-silero>=1.2,<2

@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport"/>
+<title>Aurelian Calendar - 24h Timeline</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-background": "#1a1b1f",
+                        "primary-fixed-dim": "#f6be39",
+                        "on-secondary-container": "#646464",
+                        "secondary-fixed": "#e2e2e2",
+                        "on-primary-container": "#503a00",
+                        "inverse-primary": "#f6be39",
+                        "on-primary-fixed-variant": "#5c4300",
+                        "outline": "#817662",
+                        "background": "#faf9fe",
+                        "surface-container-highest": "#e3e2e7",
+                        "outline-variant": "#d3c5ae",
+                        "surface-dim": "#dad9df",
+                        "on-tertiary-fixed": "#1a1c1f",
+                        "surface": "#faf9fe",
+                        "on-surface": "#1a1b1f",
+                        "secondary-container": "#e2e2e2",
+                        "on-primary": "#ffffff",
+                        "surface-container-high": "#e9e7ed",
+                        "error-container": "#ffdad6",
+                        "tertiary": "#5d5e63",
+                        "error": "#ba1a1a",
+                        "tertiary-fixed": "#e2e2e7",
+                        "surface-bright": "#faf9fe",
+                        "secondary": "#5e5e5e",
+                        "on-surface-variant": "#4f4634",
+                        "inverse-surface": "#2f3034",
+                        "on-tertiary-container": "#3b3d41",
+                        "primary": "#795900",
+                        "surface-container": "#eeedf3",
+                        "on-tertiary-fixed-variant": "#45474b",
+                        "primary-fixed": "#ffdfa0",
+                        "on-error-container": "#93000a",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "secondary-fixed-dim": "#c6c6c6",
+                        "on-tertiary": "#ffffff",
+                        "surface-container-low": "#f4f3f8",
+                        "on-primary-fixed": "#261a00",
+                        "tertiary-container": "#a7a8ad",
+                        "surface-variant": "#e3e2e7",
+                        "surface-container-lowest": "#ffffff",
+                        "primary-container": "#d4a017",
+                        "surface-tint": "#795900",
+                        "on-secondary": "#ffffff",
+                        "tertiary-fixed-dim": "#c6c6cb",
+                        "on-secondary-fixed-variant": "#474747",
+                        "on-error": "#ffffff",
+                        "inverse-on-surface": "#f1f0f5"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-md": "16px",
+                        "margin-desktop": "32px",
+                        "unit": "4px",
+                        "margin-mobile": "16px",
+                        "gutter": "12px",
+                        "stack-sm": "8px",
+                        "stack-lg": "24px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-sm": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["34px", { "lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" }],
+                        "body-lg": ["17px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-sm": ["15px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0", "fontWeight": "500" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { font-family: 'Inter', sans-serif; -webkit-tap-highlight-color: transparent; }
+        .timeline-grid {
+            background-image: linear-gradient(to bottom, #e3e2e7 1px, transparent 1px);
+            background-size: 100% 60px; /* 1 hour = 60px */
+        }
+        /* Hide scrollbar for clean UI */
+        ::-webkit-scrollbar { display: none; }
+        * { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background text-on-background min-h-screen flex flex-col relative pb-24">
+<!-- TopAppBar (from JSON) -->
+<header class="w-full sticky top-0 z-50 bg-background dark:bg-background flat no shadows">
+<div class="flex justify-between items-center px-margin-mobile py-stack-md max-w-[1024px] mx-auto">
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">menu</span>
+</button>
+<h1 class="font-headline-md text-headline-md text-on-background">Aurelian Calendar</h1>
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden">
+<!-- Avatar Placeholder -->
+<img alt="User Profile" class="w-full h-full object-cover" data-alt="A close up, professional headshot of a person looking forward against a neutral grey background. The lighting is soft and studio-quality, emphasizing clarity and modern corporate aesthetics. The colors are muted and natural." src="https://lh3.googleusercontent.com/aida-public/AB6AXuB0aa8XoJ2kCeV_ftfInyhpNflI2bK4l44XhqIbBgVEQgysKiERaztOgDGNA8flgBkifFjrZqUCXo4tJwgcYHGMrmLvp6UdQDOq5kR7gDqc0Z0o8-lQPRJzrZ5sGRgfHrjQt0lSJEDIxnlqoAKLc212QMAb-jUInWqjrYd4HGpXA_-yro9OIvOmtWFH_fisDOh-GD7d_JyHTdYh_laMt8hubFfb4mZgxA7uCWXASQzS9cIyD-Dz1a6Vm6QwrvhFmhwefWZRUgpX2_A"/>
+</div>
+</div>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 w-full max-w-[1024px] mx-auto px-margin-mobile relative mt-4">
+<!-- Day Selector (Context) -->
+<div class="flex items-center justify-between mb-stack-lg">
+<h2 class="font-display-lg-mobile text-display-lg-mobile text-on-surface tracking-tight">Today</h2>
+<div class="flex space-x-unit">
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-surface-container-highest transition-colors active:scale-95">
+<span class="material-symbols-outlined text-on-surface">chevron_left</span>
+</button>
+<button class="w-10 h-10 rounded-full flex items-center justify-center bg-surface-container hover:bg-surface-container-highest transition-colors active:scale-95">
+<span class="material-symbols-outlined text-on-surface">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- 24h Timeline -->
+<div class="relative w-full h-[1440px] timeline-grid mt-stack-md"> <!-- 24 hours * 60px -->
+<!-- Time Axis Labels -->
+<div class="absolute left-0 top-0 bottom-0 w-12 flex flex-col text-on-surface-variant font-label-caps text-label-caps opacity-70">
+<div class="h-[60px] relative"><span class="absolute -top-3">12 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">1 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">2 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">3 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">4 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">5 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">6 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">7 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">8 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">9 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">10 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">11 AM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">12 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">1 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">2 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">3 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">4 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">5 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">6 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">7 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">8 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">9 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">10 PM</span></div>
+<div class="h-[60px] relative"><span class="absolute -top-3">11 PM</span></div>
+</div>
+<!-- Events Canvas (Left margin offset for time labels) -->
+<div class="absolute left-16 right-0 top-0 bottom-0">
+<!-- Event 1 (9:00 AM - 10:30 AM) -->
+<div class="absolute top-[540px] h-[90px] w-full bg-surface-container-lowest rounded-lg shadow-[0px_4px_12px_rgba(0,0,0,0.05)] border-l-4 border-primary-container p-3 flex flex-col justify-start overflow-hidden active:scale-[0.98] transition-transform duration-150">
+<div class="flex justify-between items-start">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Design Sync</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">9:00 - 10:30</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1 truncate">Review Q3 visual tokens and JSON payload structure.</span>
+</div>
+<!-- Event 2 (1:00 PM - 2:00 PM) -->
+<div class="absolute top-[780px] h-[60px] w-full bg-surface-container-lowest rounded-lg shadow-[0px_4px_12px_rgba(0,0,0,0.05)] border-l-4 border-primary-container p-3 flex flex-col justify-start overflow-hidden active:scale-[0.98] transition-transform duration-150">
+<div class="flex justify-between items-start">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Lunch Break</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">1:00 - 2:00</span>
+</div>
+</div>
+<!-- Event 3 (3:30 PM - 5:00 PM) -->
+<div class="absolute top-[930px] h-[90px] w-full bg-surface-container-lowest rounded-lg shadow-[0px_4px_12px_rgba(0,0,0,0.05)] border-l-4 border-primary-container p-3 flex flex-col justify-start overflow-hidden active:scale-[0.98] transition-transform duration-150">
+<div class="flex justify-between items-start">
+<span class="font-body-sm text-body-sm font-semibold text-on-surface">Engineering Huddle</span>
+<span class="font-label-caps text-label-caps text-on-surface-variant">3:30 - 5:00</span>
+</div>
+<span class="font-body-sm text-body-sm text-on-surface-variant mt-1 truncate">Architecture review for new animation pipelines.</span>
+</div>
+</div>
+<!-- Current Time Line (e.g., 11:15 AM -> 675px) -->
+<div class="absolute top-[675px] left-0 right-0 z-10 flex items-center pointer-events-none">
+<div class="w-14 text-right pr-2">
+<span class="font-label-caps text-label-caps text-primary-container font-bold">11:15</span>
+</div>
+<div class="flex-1 h-[2px] bg-primary-container relative">
+<div class="absolute left-0 top-1/2 -translate-y-1/2 w-2 h-2 rounded-full bg-primary-container"></div>
+</div>
+</div>
+</div>
+</main>
+<!-- BottomNavBar (from JSON) -->
+<nav class="fixed bottom-0 w-full z-50 bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md shadow-[0px_-1px_0px_0px_rgba(0,0,0,0.05)] md:hidden">
+<div class="flex justify-around items-center pt-2 pb-safe px-margin-mobile">
+<!-- Active Item: Calendar -->
+<button class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-semibold hover:text-primary-container active:scale-90 transition-transform duration-150 w-16">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 1;">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</button>
+<!-- Inactive Item: Alarms -->
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-transform duration-150 w-16">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">alarm</span>
+<span class="font-label-sm text-label-sm">Alarms</span>
+</button>
+<!-- Inactive Item: Tasks -->
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-transform duration-150 w-16">
+<span class="material-symbols-outlined mb-1" style="font-variation-settings: 'FILL' 0;">check_circle</span>
+<span class="font-label-sm text-label-sm">Tasks</span>
+</button>
+</div>
+</nav>
+<!-- Safe area padding for bottom nav -->
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+    </style>
+<script>
+        // Simple script to scroll to current time on load (simulated 11:15 AM)
+        window.addEventListener('load', () => {
+            const currentLine = document.querySelector('.top-\\[675px\\]');
+            if(currentLine) {
+                currentLine.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+    </script>
+</body></html>

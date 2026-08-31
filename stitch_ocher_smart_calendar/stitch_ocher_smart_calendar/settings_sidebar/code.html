@@ -1,0 +1,295 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Chronos - Settings Navigation Drawer</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "surface-container-high": "#e9e7ed",
+                    "on-tertiary-fixed": "#1a1c1f",
+                    "on-primary-fixed-variant": "#5c4300",
+                    "surface-container-highest": "#e3e2e7",
+                    "surface-container-low": "#f4f3f8",
+                    "on-secondary-fixed": "#1b1b1b",
+                    "on-tertiary-container": "#3b3d41",
+                    "surface-tint": "#795900",
+                    "outline-variant": "#d3c5ae",
+                    "background": "#faf9fe",
+                    "on-primary-fixed": "#261a00",
+                    "tertiary": "#5d5e63",
+                    "on-background": "#1a1b1f",
+                    "primary-container": "#d4a017",
+                    "outline": "#817662",
+                    "error-container": "#ffdad6",
+                    "on-primary-container": "#503a00",
+                    "secondary-fixed": "#e2e2e2",
+                    "tertiary-fixed-dim": "#c6c6cb",
+                    "on-error": "#ffffff",
+                    "surface-variant": "#e3e2e7",
+                    "inverse-primary": "#f6be39",
+                    "primary-fixed": "#ffdfa0",
+                    "on-surface": "#1a1b1f",
+                    "inverse-surface": "#2f3034",
+                    "primary": "#795900",
+                    "secondary-fixed-dim": "#c6c6c6",
+                    "on-secondary-fixed-variant": "#474747",
+                    "inverse-on-surface": "#f1f0f5",
+                    "surface-dim": "#dad9df",
+                    "surface-bright": "#faf9fe",
+                    "on-secondary-container": "#646464",
+                    "surface": "#faf9fe",
+                    "on-tertiary": "#ffffff",
+                    "on-surface-variant": "#4f4634",
+                    "secondary": "#5e5e5e",
+                    "secondary-container": "#e2e2e2",
+                    "on-primary": "#ffffff",
+                    "on-tertiary-fixed-variant": "#45474b",
+                    "error": "#ba1a1a",
+                    "on-error-container": "#93000a",
+                    "surface-container-lowest": "#ffffff",
+                    "on-secondary": "#ffffff",
+                    "tertiary-fixed": "#e2e2e7",
+                    "tertiary-container": "#a7a8ad",
+                    "surface-container": "#eeedf3",
+                    "primary-fixed-dim": "#f6be39"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "spacing": {
+                    "stack-lg": "24px",
+                    "stack-sm": "8px",
+                    "unit": "4px",
+                    "gutter": "12px",
+                    "margin-mobile": "16px",
+                    "stack-md": "16px",
+                    "margin-desktop": "32px"
+            },
+            "fontFamily": {
+                    "label-sm": ["Inter"],
+                    "display-lg": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "label-caps": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "headline-md": ["Inter"],
+                    "display-lg-mobile": ["Inter"]
+            },
+            "fontSize": {
+                    "label-sm": ["13px", {"lineHeight": "18px", "letterSpacing": "0", "fontWeight": "500"}],
+                    "display-lg": ["34px", {"lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "body-lg": ["17px", {"lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "400"}],
+                    "label-caps": ["12px", {"lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["15px", {"lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400"}],
+                    "headline-md": ["22px", {"lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                    "display-lg-mobile": ["28px", {"lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: #d3c5ae;
+            border-radius: 20px;
+        }
+        
+        /* Toggle Switch Styles */
+        .ios-toggle {
+            appearance: none;
+            width: 51px;
+            height: 31px;
+            background: #e9e7ed;
+            border-radius: 9999px;
+            position: relative;
+            outline: none;
+            cursor: pointer;
+            transition: background 0.3s ease-in-out;
+        }
+        .ios-toggle::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 27px;
+            height: 27px;
+            background: #ffffff;
+            border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease-in-out;
+        }
+        .ios-toggle:checked {
+            background: #d4a017; /* Earthy Yellow Accent */
+        }
+        .ios-toggle:checked::after {
+            transform: translateX(20px);
+        }
+
+        /* Segmented Control */
+        .segmented-control {
+            background: #f4f3f8;
+            padding: 2px;
+            border-radius: 8px;
+            display: flex;
+        }
+        .segmented-control input[type="radio"] {
+            display: none;
+        }
+        .segmented-control label {
+            flex: 1;
+            text-align: center;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 13px;
+            font-weight: 500;
+            color: #4f4634;
+        }
+        .segmented-control input[type="radio"]:checked + label {
+            background: #ffffff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            color: #1a1b1f;
+        }
+    </style>
+</head>
+<body class="bg-surface font-body-lg text-on-surface antialiased overflow-hidden">
+<!-- Background Layer (Simulating a blurred app underneath) -->
+<div class="fixed inset-0 z-0 bg-surface-container-low" data-alt="A softly blurred, high-key minimalist calendar interface in light mode. Soft whites and light grays dominate, providing a serene, clutter-free background for a high-utility professional productivity app." style="background-image: url(&quot;https://lh3.googleusercontent.com/aida-public/AB6AXuBv3mBYMBCSALDk5JcB2ZAJX-59mhtng44Ur0bmwTama8q2HbP78ALkO0rKfAXnJLLm7dSaMoFpZho3g5w-k77pOYqodnd7nWL0HRx7kqo51h1gdXTnB8ONEI6mtk1Gzf18fRArUG59Me6Yf_F7LvXEGQdz_JroGZYk21bEJkQy0KydxkhkMO9tOTu7n_v83_z_aDZUr9jcNNiHgNnkkG1YCBqLazmfP7pmT1E1y9DztGFygo6ij-xR_zsIWH92LM0z7Pp61xR99mY&quot;);">
+<!-- Overlay blur -->
+<div class="absolute inset-0 bg-background/60 backdrop-blur-md"></div>
+</div>
+<!-- Navigation Drawer (Settings) -->
+<!-- Matches JSON: h-full w-80 fixed left-0 top-0 z-[60] bg-surface-container-lowest dark:bg-inverse-surface shadow-xl flex flex-col h-full p-stack-lg -->
+<aside class="h-full w-80 fixed left-0 top-0 z-[60] bg-surface-container-lowest shadow-xl flex flex-col h-full p-stack-lg overflow-y-auto">
+<!-- Header / Identity -->
+<div class="flex items-center justify-between mb-stack-lg pb-stack-sm border-b border-surface-container-highest">
+<h2 class="font-headline-md text-headline-md font-bold text-on-surface">Settings</h2>
+<button class="text-on-surface-variant hover:text-primary transition-colors focus:outline-none">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 0;">close</span>
+</button>
+</div>
+<!-- User Profile Section -->
+<div class="flex items-center gap-gutter mb-stack-lg p-3 rounded-xl bg-surface hover:bg-surface-container transition-colors cursor-pointer active:scale-95 duration-200">
+<div class="relative">
+<img class="w-12 h-12 rounded-full object-cover border border-surface-variant" data-alt="A professional headshot of a focused individual, clean modern lighting, minimalist aesthetic, suitable for a premium app profile avatar." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5clwu5cJNqjM1SwMbVlLPVtjlYObyD4kg5B3DH-hJx7L-xMHPnkP0_jKUNp00mQzJRAlnq_Plipb7_3zIpzGnxEwMiZ1Tq9KpyHX_sWe-dG2oggs09DQW52JencwcAxMCm-Rc5HADA_Pw5oEBl7qAW6mXPKB1bHp2Z7tgTy5w9YqcTKdrSVm0gORQ2cXfj1hExV19oYIvUybnhBbcHzvpokh-xxKZ-OngmP5ayIXtzqRXv52XJMT8u3zGqh7k5rcp6qsY8yF38A4">
+</div>
+<div class="flex-1">
+<div class="flex items-center gap-2">
+<h3 class="font-label-sm text-label-sm font-semibold text-on-surface">Alex Rivers</h3>
+<span class="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-wider bg-primary-container text-on-primary-container uppercase">PRO</span>
+</div>
+<p class="font-label-sm text-label-sm text-on-surface-variant font-normal">Personal Plan</p>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant" style="font-variation-settings: &quot;FILL&quot; 0;">chevron_right</span>
+</div>
+<!-- Scrollable Content Area -->
+<div class="flex-1 space-y-stack-lg">
+<!-- Global Nav Shared Component Items (From JSON Array) -->
+<nav class="flex flex-col gap-1 mb-stack-lg">
+<!-- Profile - Active State -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-primary font-bold bg-surface-container-high transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 1;">person</span>
+<span class="font-body-sm text-body-sm font-medium">Profile</span>
+</a>
+<!-- Preferences -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 0;">settings</span>
+<span class="font-body-sm text-body-sm">Settings</span>
+</a>
+<!-- Notification Settings -->
+
+<!-- Privacy -->
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-transform active:translate-x-1" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 0;">security</span>
+<span class="font-body-sm text-body-sm">Privacy</span>
+</a><a class="flex items-center gap-3 px-3 py-2 rounded-lg text-on-surface-variant hover:bg-surface-container transition-transform active:translate-x-1" href="#"><span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 0;">web</span><span class="font-body-sm text-body-sm">Connection</span></a>
+</nav>
+<hr class="border-surface-container-highest">
+<!-- Theme Configuration Section -->
+<section>
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-stack-sm px-3">Theme Configuration</h4>
+<div class="bg-surface-container-lowest rounded-xl flex flex-col">
+<!-- Color Palette -->
+<div class="flex items-center justify-between py-3 px-3 hover:bg-surface-container-low transition-colors rounded-t-xl cursor-pointer"><div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" style="font-variation-settings: &quot;FILL&quot; 0;">dock_to_bottom</span>
+<span class="font-body-sm text-body-sm text-on-surface">Bottom Bar Style</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" style="font-variation-settings: &quot;FILL&quot; 0;">chevron_right</span></div>
+<hr class="border-surface-container-highest mx-3">
+<!-- Dark Mode Toggle -->
+<div class="flex items-center justify-between py-3 px-3 hover:bg-surface-container-low transition-colors cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" style="font-variation-settings: &quot;FILL&quot; 0;">dark_mode</span>
+<span class="font-body-sm text-body-sm text-on-surface">Dark Mode</span>
+</div>
+<input class="ios-toggle" type="checkbox" placeholder="on" value="">
+</div>
+<hr class="border-surface-container-highest mx-3">
+<!-- Accent Color -->
+
+</div>
+</section>
+<!-- Component Layout Section -->
+<section>
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-stack-sm px-3">Component Layout</h4>
+<div class="bg-surface-container-lowest rounded-xl flex flex-col">
+<div class="flex items-center justify-between py-3 px-3 hover:bg-surface-container-low transition-colors rounded-t-xl cursor-pointer">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" style="font-variation-settings: &quot;FILL&quot; 0;">view_sidebar</span>
+<span class="font-body-sm text-body-sm text-on-surface">Adjust Navigation</span>
+</div>
+<span class="material-symbols-outlined text-on-surface-variant text-[20px]" style="font-variation-settings: &quot;FILL&quot; 0;">chevron_right</span>
+</div>
+<hr class="border-surface-container-highest mx-3">
+
+</div>
+</section>
+<!-- View Mode Section -->
+<section>
+<h4 class="font-label-caps text-label-caps text-on-surface-variant uppercase mb-stack-sm px-3">View Mode</h4>
+<div class="px-3">
+<div class="segmented-control">
+<input checked="" id="view-grid" name="view-mode" type="radio">
+<label class="flex items-center justify-center gap-2" for="view-grid">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: &quot;FILL&quot; 0;">grid_view</span>
+                            Grid Calendar
+                        </label>
+<input id="view-timeline" name="view-mode" type="radio">
+<label class="flex items-center justify-center gap-2" for="view-timeline">
+<span class="material-symbols-outlined text-[18px]" style="font-variation-settings: &quot;FILL&quot; 0;">view_timeline</span>
+                            Vertical Timeline
+                        </label>
+</div>
+</div>
+</section>
+</div>
+<!-- Footer / Logout -->
+<div class="mt-auto pt-stack-lg">
+<a class="flex items-center gap-3 px-3 py-2 rounded-lg text-error hover:bg-error-container/20 transition-colors" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: &quot;FILL&quot; 0;">logout</span>
+<span class="font-body-sm text-body-sm font-medium">Logout</span>
+</a>
+</div>
+</aside>
+
+
+</body></html>

@@ -1,0 +1,245 @@
+<!DOCTYPE html><html class="light" lang="en" style=""><head>
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Aurelian Calendar - Tasks</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "outline": "#817662",
+                        "surface-container": "#eeedf3",
+                        "secondary-container": "#e2e2e2",
+                        "on-tertiary-fixed-variant": "#45474b",
+                        "on-primary-fixed": "#261a00",
+                        "secondary-fixed": "#e2e2e2",
+                        "inverse-primary": "#f6be39",
+                        "on-surface-variant": "#4f4634",
+                        "on-surface": "#1a1b1f",
+                        "inverse-surface": "#2f3034",
+                        "outline-variant": "#d3c5ae",
+                        "on-primary-fixed-variant": "#5c4300",
+                        "on-tertiary-fixed": "#1a1c1f",
+                        "primary-fixed-dim": "#f6be39",
+                        "secondary": "#5e5e5e",
+                        "primary": "#795900",
+                        "background": "#faf9fe",
+                        "on-tertiary": "#ffffff",
+                        "on-secondary-container": "#646464",
+                        "on-secondary": "#ffffff",
+                        "on-secondary-fixed-variant": "#474747",
+                        "surface-container-low": "#f4f3f8",
+                        "on-tertiary-container": "#3b3d41",
+                        "on-background": "#1a1b1f",
+                        "secondary-fixed-dim": "#c6c6c6",
+                        "tertiary-fixed-dim": "#c6c6cb",
+                        "on-primary-container": "#503a00",
+                        "error": "#ba1a1a",
+                        "surface-tint": "#795900",
+                        "inverse-on-surface": "#f1f0f5",
+                        "surface-dim": "#dad9df",
+                        "primary-fixed": "#ffdfa0",
+                        "on-secondary-fixed": "#1b1b1b",
+                        "surface": "#faf9fe",
+                        "error-container": "#ffdad6",
+                        "surface-bright": "#faf9fe",
+                        "on-error-container": "#93000a",
+                        "on-primary": "#ffffff",
+                        "tertiary-fixed": "#e2e2e7",
+                        "surface-container-high": "#e9e7ed",
+                        "surface-container-highest": "#e3e2e7",
+                        "tertiary-container": "#a7a8ad",
+                        "on-error": "#ffffff",
+                        "tertiary": "#5d5e63",
+                        "primary-container": "#d4a017",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-variant": "#e3e2e7"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "stack-sm": "8px",
+                        "margin-desktop": "32px",
+                        "unit": "4px",
+                        "gutter": "12px",
+                        "stack-lg": "24px",
+                        "stack-md": "16px",
+                        "margin-mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "display-lg": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "label-caps": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "headline-md": ["Inter"],
+                        "display-lg-mobile": ["Inter"]
+                    },
+                    "fontSize": {
+                        "display-lg": ["34px", { "lineHeight": "41px", "letterSpacing": "-0.02em", "fontWeight": "700" }],
+                        "body-lg": ["17px", { "lineHeight": "22px", "letterSpacing": "-0.01em", "fontWeight": "400" }],
+                        "label-sm": ["13px", { "lineHeight": "18px", "letterSpacing": "0", "fontWeight": "500" }],
+                        "label-caps": ["12px", { "lineHeight": "16px", "letterSpacing": "0.05em", "fontWeight": "600" }],
+                        "body-sm": ["15px", { "lineHeight": "20px", "letterSpacing": "0", "fontWeight": "400" }],
+                        "headline-md": ["22px", { "lineHeight": "28px", "letterSpacing": "-0.01em", "fontWeight": "600" }],
+                        "display-lg-mobile": ["28px", { "lineHeight": "34px", "letterSpacing": "-0.01em", "fontWeight": "700" }]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        body { background-color: #F2F2F7; }
+        .ios-list-item:active { background-color: #E5E5EA; transform: scale(0.98); }
+        .checkbox-custom:checked + label { text-decoration: line-through; color: #a7a8ad; }
+    </style>
+</head>
+<body class="text-on-background font-body-sm h-screen flex flex-col overflow-hidden">
+<!-- TopAppBar -->
+<header class="bg-background dark:bg-background w-full sticky top-0 z-50 flat no shadows">
+<div class="flex justify-between items-center px-margin-mobile py-stack-md max-w-[1024px] mx-auto">
+<button class="text-primary dark:text-primary-fixed-dim hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<span class="material-symbols-outlined" data-icon="menu">menu</span>
+</button>
+<h1 class="font-semibold text-on-surface text-body-sm lowercase">chronos</h1>
+<div class="hover:opacity-80 transition-opacity active:scale-95 transition-transform duration-200">
+<img class="w-8 h-8 rounded-full object-cover" data-alt="A small circular user profile photo showing a person in soft lighting. The image should be minimalist and fit a clean, high-utility aesthetic. Muted earthy tones." src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3VHg_vhk8z6keJJNdjf7UDDQnxakIABiUjZkmEEyEi0BFMJkBFNTfQkl_plOng8Xr1qz3nQK_dzXidY0fH4LLxGbUE9RhLRBfibvgO5tvcjtg-Qxa-vlOKz2soEQ_5EMn5iJjXrUNVFDadt2Vz5GRcFV3O99LL9YS_j0_eyaXwb1orpsyrZNG5WWBbMm_cLsaBdM61-kXnVHuaz29zutFPfNMk7C0CJDTovTJI5SSGkMuUn08WyIONGnh5CkajawA1hTAJfR3ZLk">
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="flex-1 overflow-y-auto pb-[80px] px-margin-mobile max-w-[1024px] mx-auto w-full mt-stack-md space-y-stack-lg">
+<!-- Header Section -->
+<div class="flex justify-between items-end">
+<div>
+<h2 class="font-display-lg text-display-lg-mobile md:text-display-lg">Tasks</h2>
+<p class="font-body-sm text-body-sm text-on-surface-variant mt-unit">5 remaining today</p>
+</div>
+</div>
+<!-- Task Categories -->
+<div class="flex space-x-gutter overflow-x-auto pb-unit no-scrollbar">
+<button class="px-4 py-2 rounded-full bg-primary-container text-on-primary font-label-sm text-label-sm whitespace-nowrap active:scale-95 transition-transform duration-200 shadow-[0px_4px_12px_rgba(0,0,0,0.05)]">All Tasks</button>
+<button class="px-4 py-2 rounded-full bg-surface text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap active:scale-95 transition-transform duration-200 border border-outline-variant">Work</button>
+<button class="px-4 py-2 rounded-full bg-surface text-on-surface-variant font-label-sm text-label-sm whitespace-nowrap active:scale-95 transition-transform duration-200 border border-outline-variant">Personal</button>
+</div>
+<!-- Task List: Work -->
+<section class="space-y-stack-sm">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase ml-4">Work</h3>
+<div class="bg-surface rounded-lg shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden">
+<!-- Task Item 1 -->
+<div class="ios-list-item flex items-center p-4 min-h-[44px] border-b border-surface-variant transition-colors duration-150">
+<div class="flex-shrink-0 mr-gutter">
+<input class="peer hidden" id="task1" type="checkbox">
+<label class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center cursor-pointer peer-checked:bg-primary-container peer-checked:border-primary-container transition-colors" for="task1">
+<span class="material-symbols-outlined text-on-primary text-[16px] opacity-0 peer-checked:opacity-100 transition-opacity" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</label>
+</div>
+<div class="flex-1">
+<label class="font-body-lg text-body-lg cursor-pointer block peer-checked:text-tertiary peer-checked:line-through transition-colors" for="task1">Finalize Q3 Presentation</label>
+</div>
+<div class="flex-shrink-0 text-on-surface-variant">
+<span class="font-body-sm text-body-sm">2:00 PM</span>
+</div>
+</div>
+<!-- Task Item 2 (Completed) -->
+<div class="ios-list-item flex items-center p-4 min-h-[44px] transition-colors duration-150">
+<div class="flex-shrink-0 mr-gutter">
+<input checked="" class="peer hidden" id="task2" type="checkbox">
+<label class="w-6 h-6 rounded-full border-2 border-primary-container bg-primary-container flex items-center justify-center cursor-pointer transition-colors" for="task2">
+<span class="material-symbols-outlined text-on-primary text-[16px]" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</label>
+</div>
+<div class="flex-1">
+<label class="font-body-lg text-body-lg cursor-pointer block text-tertiary line-through transition-colors" for="task2">Email Team Updates</label>
+</div>
+<div class="flex-shrink-0 text-on-surface-variant">
+<span class="font-body-sm text-body-sm">10:00 AM</span>
+</div>
+</div>
+</div>
+</section>
+<!-- Task List: Personal -->
+<section class="space-y-stack-sm mt-stack-lg">
+<h3 class="font-label-caps text-label-caps text-on-surface-variant uppercase ml-4">Personal</h3>
+<div class="bg-surface rounded-lg shadow-[0px_4px_12px_rgba(0,0,0,0.05)] overflow-hidden">
+<!-- Task Item 3 -->
+<div class="ios-list-item flex items-center p-4 min-h-[44px] border-b border-surface-variant transition-colors duration-150">
+<div class="flex-shrink-0 mr-gutter">
+<input class="peer hidden" id="task3" type="checkbox">
+<label class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center cursor-pointer peer-checked:bg-primary-container peer-checked:border-primary-container transition-colors" for="task3">
+<span class="material-symbols-outlined text-on-primary text-[16px] opacity-0 peer-checked:opacity-100 transition-opacity" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</label>
+</div>
+<div class="flex-1">
+<label class="font-body-lg text-body-lg cursor-pointer block peer-checked:text-tertiary peer-checked:line-through transition-colors" for="task3">Grocery Shopping</label>
+</div>
+<div class="flex-shrink-0 text-on-surface-variant">
+<span class="material-symbols-outlined text-[20px]" data-icon="shopping_cart">shopping_cart</span>
+</div>
+</div>
+<!-- Task Item 4 -->
+<div class="ios-list-item flex items-center p-4 min-h-[44px] transition-colors duration-150">
+<div class="flex-shrink-0 mr-gutter">
+<input class="peer hidden" id="task4" type="checkbox">
+<label class="w-6 h-6 rounded-full border-2 border-outline-variant flex items-center justify-center cursor-pointer peer-checked:bg-primary-container peer-checked:border-primary-container transition-colors" for="task4">
+<span class="material-symbols-outlined text-on-primary text-[16px] opacity-0 peer-checked:opacity-100 transition-opacity" data-icon="check" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check</span>
+</label>
+</div>
+<div class="flex-1">
+<label class="font-body-lg text-body-lg cursor-pointer block peer-checked:text-tertiary peer-checked:line-through transition-colors" for="task4">Call Mom</label>
+</div>
+</div>
+</div>
+</section>
+<!-- Add Task FAB -->
+<button class="fixed bottom-[90px] right-margin-mobile w-14 h-14 bg-primary-container rounded-full flex items-center justify-center shadow-lg active:scale-90 transition-transform duration-200 z-40 md:hidden">
+<span class="material-symbols-outlined text-on-primary" data-icon="add">add</span>
+</button>
+</main>
+<!-- BottomNavBar -->
+<nav class="bg-surface/80 dark:bg-surface-dim/80 backdrop-blur-md fixed bottom-0 w-full z-50 bg-surface dark:bg-surface-dim shadow-[0px_-1px_0px_0px_rgba(0,0,0,0.05)] md:hidden">
+<div class="flex justify-around items-center pt-2 pb-safe px-margin-mobile h-[72px]">
+<!-- Calendar (Inactive) -->
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-transform duration-150 w-16">
+<span class="material-symbols-outlined mb-1" data-icon="calendar_month">calendar_month</span>
+<span class="font-label-sm text-label-sm">Calendar</span>
+</button>
+<!-- Alarms (Inactive) -->
+<button class="flex flex-col items-center justify-center text-secondary dark:text-secondary-fixed-dim hover:text-primary-container active:scale-90 transition-transform duration-150 w-16">
+<span class="material-symbols-outlined mb-1" data-icon="alarm">alarm</span>
+<span class="font-label-sm text-label-sm">Alarms</span>
+</button>
+<!-- Tasks (Active) -->
+<button class="flex flex-col items-center justify-center text-primary dark:text-primary-fixed-dim font-semibold hover:text-primary-container active:scale-90 transition-transform duration-150 w-16">
+<span class="material-symbols-outlined mb-1" data-icon="check_circle" data-weight="fill" style="font-variation-settings: 'FILL' 1;">check_circle</span>
+<span class="font-label-sm text-label-sm">Tasks</span>
+</button>
+</div>
+</nav>
+<!-- Add safe area padding for bottom nav on iOS -->
+<style>
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom, 16px); }
+    </style>
+<script>
+        // Simple logic for custom checkboxes to toggle line-through state on the label
+        document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+            checkbox.addEventListener('change', (e) => {
+                const label = e.target.closest('.ios-list-item').querySelector('.flex-1 label');
+                if(e.target.checked) {
+                    label.classList.add('text-tertiary', 'line-through');
+                } else {
+                    label.classList.remove('text-tertiary', 'line-through');
+                }
+            });
+        });
+    </script>
+</body></html>

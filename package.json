@@ -1,0 +1,11 @@
+{
+  "name": "chronos-app",
+  "private": true,
+  "version": "0.1.0",
+  "dependencies": {
+    "expo-font": "^57.0.1"
+  },
+  "devDependencies": {
+    "supabase": "^2.116.0"
+  }
+}

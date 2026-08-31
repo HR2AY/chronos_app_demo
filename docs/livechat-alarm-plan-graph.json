@@ -1,0 +1,124 @@
+{
+  "version": 1,
+  "goal": "Analyze how livechat can connect to the alarm section of Chronos.",
+  "nodes": [
+    {
+      "id": "G1",
+      "type": "goal",
+      "label": "Analyze livechat integration into alarms",
+      "status": "completed",
+      "result_summary": "User asked to explore the current project and produce a technical analysis for connecting livechat to the alarm section."
+    },
+    {
+      "id": "S1",
+      "type": "inspect",
+      "label": "Inspect repo shape",
+      "status": "completed",
+      "result_summary": "Found Expo/React Native mobile app, FastAPI server, LiveKit token service, LiveKit Python agent, AlarmKit wrapper, and Stitch alarm design artifacts."
+    },
+    {
+      "id": "S2",
+      "type": "inspect",
+      "label": "Trace alarm code",
+      "status": "completed",
+      "result_summary": "Alarm screen renders static local data; AlarmKit wrapper exists but native bridge implementation and UI calls are missing.",
+      "evidence": [
+        "mobile/src/screens/AurelianCalendarScreen.tsx:38",
+        "mobile/src/screens/AurelianCalendarScreen.tsx:397",
+        "mobile/src/native/alarmkit.ts:16"
+      ]
+    },
+    {
+      "id": "S3",
+      "type": "inspect",
+      "label": "Trace LiveKit code",
+      "status": "completed",
+      "result_summary": "Mobile can request a token, server can sign it, and agent can join a room, but no room/chat UI is rendered yet.",
+      "evidence": [
+        "mobile/src/services/livekit.ts:14",
+        "server/app/main.py:124",
+        "server/app/livekit_service.py:23",
+        "agent/main.py:15",
+        "docs/livekit.md:13"
+      ]
+    },
+    {
+      "id": "S4",
+      "type": "inspect",
+      "label": "Trace calendar and persistence model",
+      "status": "completed",
+      "result_summary": "Calendar events are mapped from timeline_items; there is no alarm table or alarm API.",
+      "evidence": [
+        "server/app/db.py:41",
+        "server/app/calendar_service.py:99",
+        "server/app/calendar_service.py:252"
+      ]
+    },
+    {
+      "id": "D1",
+      "type": "decision",
+      "label": "Introduce dedicated alarm domain",
+      "status": "completed",
+      "result_summary": "Alarms should not be stored as timeline_items because they have separate lifecycle, enabled state, native ids, smart rules, and sync state."
+    },
+    {
+      "id": "D2",
+      "type": "decision",
+      "label": "Split source of truth and execution",
+      "status": "completed",
+      "result_summary": "Server should own alarm intent; mobile should execute native AlarmKit scheduling and report native ids or failures."
+    },
+    {
+      "id": "A1",
+      "type": "architecture",
+      "label": "Add alarm REST API",
+      "status": "recommended",
+      "result_summary": "Add GET/POST/PATCH/DELETE /api/alarms and optional preview endpoint for smart suggestions."
+    },
+    {
+      "id": "A2",
+      "type": "architecture",
+      "label": "Add LiveKit agent tools",
+      "status": "recommended",
+      "result_summary": "Expose typed tools such as list_upcoming_events, create_alarm, update_alarm, and cancel_alarm."
+    },
+    {
+      "id": "A3",
+      "type": "architecture",
+      "label": "Add mobile LiveKit and alarm sync",
+      "status": "recommended",
+      "result_summary": "Replace static alarm rows with fetched records, add LiveKit room UI, schedule/cancel through AlarmKit, and PATCH native scheduling state."
+    },
+    {
+      "id": "R1",
+      "type": "risk",
+      "label": "Identify risks",
+      "status": "completed",
+      "result_summary": "Main risks are iOS-only AlarmKit behavior, permissions, timezone correctness, agent confirmation, and native/server sync failure."
+    },
+    {
+      "id": "F1",
+      "type": "final",
+      "label": "Technical analysis complete",
+      "status": "completed",
+      "result_summary": "Livechat integration is feasible, but should be layered through alarm persistence and agent tools before native scheduling."
+    }
+  ],
+  "edges": [
+    { "from": "G1", "to": "S1" },
+    { "from": "S1", "to": "S2" },
+    { "from": "S1", "to": "S3" },
+    { "from": "S1", "to": "S4" },
+    { "from": "S2", "to": "D1" },
+    { "from": "S4", "to": "D1" },
+    { "from": "S2", "to": "D2" },
+    { "from": "S3", "to": "D2" },
+    { "from": "D1", "to": "A1" },
+    { "from": "D2", "to": "A2" },
+    { "from": "D2", "to": "A3" },
+    { "from": "A1", "to": "R1" },
+    { "from": "A2", "to": "R1" },
+    { "from": "A3", "to": "R1" },
+    { "from": "R1", "to": "F1" }
+  ]
+}

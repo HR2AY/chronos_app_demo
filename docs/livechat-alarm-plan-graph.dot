@@ -1,0 +1,35 @@
+digraph LivechatAlarmPlanGraph {
+  rankdir=TD;
+  graph [fontname="Arial", bgcolor="transparent"];
+  node [shape=box, style="rounded,filled", fontname="Arial", color="#64748b", fillcolor="#f8fafc"];
+  edge [fontname="Arial", color="#94a3b8"];
+
+  G1 [label="Goal: Analyze livechat integration into alarms\ncompleted", fillcolor="#ecfeff", color="#0891b2"];
+  S1 [label="Inspect repo shape\nExpo mobile + FastAPI server + LiveKit agent", fillcolor="#f0f9ff"];
+  S2 [label="Trace alarm code\nStatic AlarmsView + AlarmKit JS wrapper only", fillcolor="#fefce8"];
+  S3 [label="Trace LiveKit code\nToken endpoint + token client + Python agent", fillcolor="#eef2ff"];
+  S4 [label="Trace calendar/event model\ntimeline_items powers calendar events", fillcolor="#f8fafc"];
+  D1 [label="Decision: add alarm domain\nDo not overload timeline_items", fillcolor="#fff7ed", color="#ea580c"];
+  D2 [label="Decision: server owns intent\nMobile owns native AlarmKit execution", fillcolor="#fff7ed", color="#ea580c"];
+  A1 [label="Recommended API\nGET/POST/PATCH/DELETE /api/alarms", fillcolor="#f0fdf4", color="#16a34a"];
+  A2 [label="Recommended agent tools\nlist_events/create_alarm/update_alarm/cancel_alarm", fillcolor="#f0fdf4", color="#16a34a"];
+  A3 [label="Recommended mobile work\nAlarm service + LiveKit room + native sync", fillcolor="#f0fdf4", color="#16a34a"];
+  R1 [label="Risks\niOS only, authorization, timezone, sync failures", fillcolor="#fef2f2", color="#dc2626"];
+  F1 [label="Finding\nFeasible, but needs alarm persistence before real livechat scheduling", fillcolor="#ecfeff", color="#0891b2"];
+
+  G1 -> S1;
+  S1 -> S2;
+  S1 -> S3;
+  S1 -> S4;
+  S2 -> D1;
+  S4 -> D1;
+  S2 -> D2;
+  S3 -> D2;
+  D1 -> A1;
+  D2 -> A2;
+  D2 -> A3;
+  A1 -> R1;
+  A2 -> R1;
+  A3 -> R1;
+  R1 -> F1;
+}
