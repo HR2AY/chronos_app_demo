@@ -129,6 +129,25 @@ def init_db() -> None:
       CREATE INDEX IF NOT EXISTS idx_alarms_activation_time
         ON alarms(activation_time, id);
 
+      CREATE TABLE IF NOT EXISTS alarm_challenges (
+        id TEXT PRIMARY KEY,
+        alarm_id TEXT NOT NULL,
+        kind TEXT NOT NULL CHECK (kind IN ('arithmetic', 'text')),
+        prompt TEXT NOT NULL,
+        expected_hash TEXT NOT NULL,
+        status TEXT NOT NULL CHECK (status IN ('pending', 'presented', 'submitted', 'passed', 'failed', 'expired', 'cancelled')),
+        attempts_used INTEGER NOT NULL DEFAULT 0,
+        max_attempts INTEGER NOT NULL DEFAULT 3,
+        expires_at TEXT NOT NULL,
+        round_number INTEGER NOT NULL,
+        idempotency_key TEXT NOT NULL UNIQUE,
+        created_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        updated_at TEXT NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_alarm_challenges_alarm_status
+        ON alarm_challenges(alarm_id, status);
+
       CREATE TRIGGER IF NOT EXISTS trg_timeline_items_block_point_mixed_insert
       BEFORE INSERT ON timeline_items
       FOR EACH ROW

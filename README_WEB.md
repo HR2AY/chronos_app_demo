@@ -5,9 +5,19 @@
 - `mobile`：Expo Web 日历和 Chat 覆盖层
 - `server`：FastAPI API
 - `agent`：LiveKit Agent 和 OpenAI Realtime
-- `docs`、`STARTUP.md`：设计、集成和网络排障说明
+- `docs`、`STARTUP.md`：前端设计、集成和网络排障说明
 
 ## 只启动 Web 日历
+
+## 可视化启动器（推荐）
+
+双击项目根目录的 `start_launcher.bat`，或运行：
+
+```powershell
+python launcher.py
+```
+
+启动器会集中管理日历 Web、API 和 Realtime Agent：每项服务都可以单独启动/停止，顶部支持一键启动和停止全部，底部会显示实时日志。服务状态会自动探测；前端启动后可直接点击“打开日历”。
 
 ```powershell
 cd "E:\code\chronos _web\mobile"
@@ -19,7 +29,7 @@ npx expo start --web --port 8082
 
 当前 `.env` 已配置 `EXPO_PUBLIC_PREVIEW_SCREEN=calendar`，Web 默认进入日历。
 
-没有后端时，日历页面仍可通过前端 fallback 数据预览；闹钟 CRUD、登录和语音 Chat 需要 API、Supabase 或 LiveKit 服务。
+当前阶段专注前端设计。没有后端时，日历、闹钟、任务、设置和 Chat 覆盖层仍可通过前端 fallback 数据预览；登录、持久化和语音能力留待后续接入。
 
 ## Demo 数据
 

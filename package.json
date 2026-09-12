@@ -5,7 +5,5 @@
   "dependencies": {
     "expo-font": "^57.0.1"
   },
-  "devDependencies": {
-    "supabase": "^2.116.0"
-  }
+  "devDependencies": {}
 }

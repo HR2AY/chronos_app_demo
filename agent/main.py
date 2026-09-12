@@ -1,6 +1,8 @@
 import os
 import asyncio
+import json
 import logging
+from typing import Literal
 
 import aiohttp
 
@@ -12,7 +14,7 @@ except ModuleNotFoundError:
 if load_dotenv:
   load_dotenv()
 
-from livekit.agents import Agent, AgentSession, JobContext, WorkerOptions, cli
+from livekit.agents import Agent, AgentSession, JobContext, RunContext, WorkerOptions, cli, function_tool
 from livekit.plugins import openai, silero
 
 from prompt_context import build_agent_instructions, build_greeting, parse_session_metadata
@@ -64,9 +66,70 @@ async def connect_to_livekit(ctx: JobContext) -> None:
       await asyncio.sleep(delay * attempt)
 
 
+def _api_base_url() -> str:
+  return os.getenv("CHRONOS_API_BASE_URL", "http://127.0.0.1:8000").rstrip("/")
+
+
+async def _publish_challenge_event(context: RunContext, payload: dict) -> None:
+  # RoomIO keeps the concrete rtc.Room used by the session. Publishing a
+  # structured event avoids asking the model or UI to parse spoken text.
+  room_io = context.session.room_io
+  room = getattr(room_io, "_room", None)
+  if room is None:
+    return
+  await room.local_participant.publish_data(
+    json.dumps(payload, ensure_ascii=False), reliable=True, topic="alarm_challenge"
+  )
+
+
+@function_tool()
+async def start_alarm_challenge(
+  context: RunContext,
+  alarm_id: str,
+  kind: Literal["arithmetic", "text"],
+  difficulty: Literal["easy", "medium"],
+  prompt: str = "抓住这次FDE机会",
+) -> str:
+  """Start a deterministic wake-up challenge and show it to the user.
+
+  Call only after the user explicitly consents. For text challenges, choose a
+  concise user-facing prompt of at most 15 Unicode characters. If omitted, the
+  default demo text is used; the answer is never returned to the model.
+  """
+  context.disallow_interruptions()
+  if kind == "text" and not 1 <= len(prompt.strip()) <= 15:
+    raise ValueError("Text challenge prompt must contain between 1 and 15 Unicode characters")
+  async with aiohttp.ClientSession() as http:
+    async with http.post(
+      f"{_api_base_url()}/api/alarm-challenges",
+      json={"alarm_id": alarm_id, "kind": kind, "difficulty": difficulty, "prompt": prompt, "round": 1,
+            "idempotency_key": f"{alarm_id}:1"},
+    ) as response:
+      if response.status >= 500:
+        raise RuntimeError("Challenge service is temporarily unavailable")
+      if response.status >= 400:
+        raise RuntimeError(f"Challenge service rejected the request ({response.status})")
+      result = await response.json()
+  await _publish_challenge_event(context, {"event": "alarm_challenge.created", "version": 1, **result})
+  return json.dumps(result, ensure_ascii=False)
+
+
+@function_tool()
+async def get_alarm_challenge_result(context: RunContext, challenge_id: str) -> str:
+  """Read the server-validated result of a submitted wake-up challenge."""
+  async with aiohttp.ClientSession() as http:
+    async with http.get(f"{_api_base_url()}/api/alarm-challenges/{challenge_id}") as response:
+      if response.status >= 500:
+        raise RuntimeError("Challenge service is temporarily unavailable")
+      if response.status == 404:
+        raise RuntimeError("Challenge was not found")
+      result = await response.json()
+  return json.dumps(result, ensure_ascii=False)
+
+
 class ChronosAgent(Agent):
   def __init__(self, instructions: str) -> None:
-    super().__init__(instructions=instructions)
+    super().__init__(instructions=instructions, tools=[])
 
 
 async def entrypoint(ctx: JobContext) -> None:
@@ -80,6 +143,11 @@ async def entrypoint(ctx: JobContext) -> None:
     realtime_enabled,
   )
   session_context = parse_session_metadata(ctx.job.metadata)
+  selected_language = session_context.annotation.get("language") if session_context.annotation else None
+  if selected_language in {"中文", "Chinese", "zh", "ZH"}:
+    language = "Chinese"
+  elif selected_language in {"EN", "English", "en", "EN-US"}:
+    language = "English"
   logger.info(
     "session context loaded location=%s coach=%s alarm=%s",
     session_context.location,
@@ -146,10 +214,11 @@ async def entrypoint(ctx: JobContext) -> None:
     )
 
   session_started = False
+  agent = ChronosAgent(instructions=instructions)
   try:
     await session.start(
       room=ctx.room,
-      agent=ChronosAgent(instructions=instructions),
+      agent=agent,
     )
     session_started = True
 
@@ -184,6 +253,41 @@ async def entrypoint(ctx: JobContext) -> None:
           await asyncio.sleep(attempt)
     if not greeting_succeeded:
       logger.error("initial greeting unavailable; Realtime connection did not become ready")
+
+    # Consent gate: challenge tools stay out of the Realtime schema until the
+    # third ordinary user turn has completed and an explicit yes is heard.
+    conversation_rounds = 0
+    consent_state = "normal"
+    consent_words = {"是", "好", "可以", "开始", "yes", "ok", "start", "yeah", "同意"}
+
+    def normalized_consent(transcript: str) -> bool:
+      compact = "".join(transcript.lower().split()).strip("。！!，,？?")
+      return compact in consent_words
+
+    def on_user_input(event) -> None:
+      nonlocal conversation_rounds, consent_state
+      if not event.is_final or not event.transcript.strip():
+        return
+      if consent_state == "awaiting_consent":
+        if normalized_consent(event.transcript):
+          consent_state = "granted"
+          asyncio.create_task(agent.update_tools([start_alarm_challenge, get_alarm_challenge_result]))
+          asyncio.create_task(session.generate_reply(
+            instructions="The user explicitly consented. Start a text challenge now by calling start_alarm_challenge with the current alarm id, kind text, difficulty easy, and a concise prompt of no more than 15 Unicode characters."
+          ))
+        else:
+          consent_state = "consent_denied"
+        return
+      if consent_state != "normal":
+        return
+      conversation_rounds += 1
+      if conversation_rounds >= 3:
+        consent_state = "awaiting_consent"
+        asyncio.create_task(session.generate_reply(
+          instructions="Ask the user whether they explicitly consent to complete the wake-up text challenge. Ask only that one question and do not call tools yet."
+        ))
+
+    session.on("user_input_transcribed", on_user_input)
   except Exception:
     if session_started:
       await session.aclose()

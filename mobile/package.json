@@ -19,7 +19,6 @@
     "@livekit/react-native-webrtc": "latest",
     "@react-native-async-storage/async-storage": "^3.1.1",
     "@shopify/react-native-skia": "2.6.2",
-    "@supabase/supabase-js": "^2.112.4",
     "expo": "latest",
     "expo-constants": "latest",
     "expo-dev-client": "latest",

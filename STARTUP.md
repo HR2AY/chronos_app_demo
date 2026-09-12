@@ -1,6 +1,6 @@
 # Chronos 本地启动手册
 
-这份文档给后续 coding AI 和维护者使用。Chronos 是一个三进程本地应用：日历 Web、FastAPI API、LiveKit Agent。启动时应把它们当作三个独立服务处理。
+这份文档给后续 coding AI 和维护者使用。当前阶段先专注 Chronos 的前端设计与浏览器预览；API 和 LiveKit Agent 属于后续联调范围。
 
 ## 架构和端口
 
@@ -23,6 +23,16 @@ Agent     http://127.0.0.1:8081/  （管理/健康端口，不是聊天页面）
 如果 `8082` 也被占用，选择新的 Expo 端口，并同步使用新的浏览器 URL；API 和 Agent 端口不要随意改，除非同时修改配置和启动参数。
 
 ## 启动前检查
+
+### 可视化启动器（推荐）
+
+在项目根目录双击 `start_launcher.bat`，即可打开 Chronos 启动器。也可以运行：
+
+```powershell
+python launcher.py
+```
+
+启动器支持日历 Web、API、Realtime Agent 的单独启动/停止和一键启动/停止，并会自动显示端口状态与实时日志。前端启动后点击“打开日历”即可访问 `http://127.0.0.1:8082/`。
 
 ### 1. 确认日历是主界面
 
@@ -78,31 +88,6 @@ OPENAI_HTTP_PROXY=http://127.0.0.1:7890
 
 ## 首次安装
 
-### Supabase 本地栈
-
-需要 Docker Desktop 正在运行。在仓库根目录执行：
-
-```powershell
-npm install
-npx supabase start
-npx supabase status
-```
-
-本地 API、Postgres、Studio 和 Mailpit 默认分别使用 `54321`、`54322`、`54323`、`54324`。将 `npx supabase status` 输出的 publishable/anon key 填入 `mobile/.env.local`：
-
-```env
-EXPO_PUBLIC_SUPABASE_URL=http://127.0.0.1:54321
-EXPO_PUBLIC_SUPABASE_ANON_KEY=<local-anon-key>
-```
-
-重建测试数据库：
-
-```powershell
-npx supabase db reset
-```
-
-Supabase 只承载 Auth、用户状态和自定义上下文；日历、闹钟与 LiveKit token 仍使用 FastAPI。
-
 ### Web
 
 ```powershell
@@ -128,6 +113,19 @@ cd C:\Users\lenovo\Documents\chronos_app\agent
 如果 `.venv` 已经存在，不要每次重复创建环境；只在依赖变更后重新安装。
 
 ## 推荐启动顺序
+
+### 当前阶段：只启动 Web
+
+先启动 Expo Web 即可进行前端设计验收：
+
+```powershell
+cd C:\Users\lenovo\Documents\chronos_app\mobile
+npx expo start --web --port 8082
+```
+
+打开 `http://127.0.0.1:8082/`。日历、闹钟、任务、设置和 Chat 覆盖层会使用前端 fallback 数据运行。
+
+### 后续联调：API 与 Agent
 
 建议使用三个 PowerShell 窗口，按下面顺序启动。
 

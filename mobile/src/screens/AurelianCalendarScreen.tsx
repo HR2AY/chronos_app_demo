@@ -21,6 +21,9 @@ import { ArrowLeft, Mic, Pencil } from "lucide-react-native";
 import { Alarm, createAlarm, deleteAlarm, fetchAlarms, updateAlarm } from "../services/alarms";
 import { GlassCard } from "../components/GlassCard";
 import { LiveKitChatScreen } from "./chat/LiveKitChatScreen";
+import { IncomingCallOverlay } from "../components/IncomingCallOverlay";
+import { playUiSound, playUiSoundLoop, stopUiSoundLoop, unlockUiSounds } from "../services/uiSounds";
+import { AnnotationContext, DEFAULT_ANNOTATION_CONTEXT, loadAnnotationContext, saveAnnotationContext } from "../services/annotationContext";
 
 gsap.registerPlugin(useGSAP);
 
@@ -49,7 +52,11 @@ export function AurelianCalendarScreen() {
   const [alarmError, setAlarmError] = useState<string | null>(null);
   const [alarmEditor, setAlarmEditor] = useState<Alarm | "new" | null>(null);
   const [activeAlarmChat, setActiveAlarmChat] = useState<Alarm | null>(null);
+  const [incomingCall, setIncomingCall] = useState(false);
+  const [callAccepted, setCallAccepted] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [annotationEditorOpen, setAnnotationEditorOpen] = useState(false);
+  const [annotationContext, setAnnotationContext] = useState<AnnotationContext>(DEFAULT_ANNOTATION_CONTEXT);
   const [alarmAnimationOrigin, setAlarmAnimationOrigin] = useState<AnimationOrigin | null>(null);
   const apiBaseUrl = getApiBaseUrl();
 
@@ -69,12 +76,45 @@ export function AurelianCalendarScreen() {
     void refreshAlarms();
   }, [apiBaseUrl]);
 
+  useEffect(() => {
+    void loadAnnotationContext().then(setAnnotationContext);
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+    if (incomingCall) {
+      void unlockUiSounds().then(() => {
+        if (!cancelled) playUiSoundLoop("incoming-call");
+      });
+    } else {
+      stopUiSoundLoop("incoming-call");
+    }
+    return () => {
+      cancelled = true;
+      stopUiSoundLoop("incoming-call");
+    };
+  }, [incomingCall]);
+
+  const openAlarmChat = (alarm: Alarm) => {
+    void unlockUiSounds();
+    setCallAccepted(false);
+    setIncomingCall(true);
+    setActiveAlarmChat(alarm);
+  };
+
+  const closeAlarmChat = () => {
+    stopUiSoundLoop("incoming-call");
+    setIncomingCall(false);
+    setCallAccepted(false);
+    setActiveAlarmChat(null);
+  };
+
   return (
     <View style={styles.webViewport}>
       <View style={styles.root}>
       <StatusBar style="dark" />
       <SafeAreaView style={styles.safeArea}>
-        <TopBar onMenuPress={() => setSettingsOpen(true)} fontLoaded={fontsLoaded} />
+        <TopBar onMenuPress={() => { void unlockUiSounds().then(() => playUiSound("expand")); setSettingsOpen(true); }} fontLoaded={fontsLoaded} />
         <ScrollView
           style={styles.scroll}
           contentContainerStyle={styles.content}
@@ -98,14 +138,15 @@ export function AurelianCalendarScreen() {
               }
             }}
             activeAlarmId={activeAlarmChat?.id ?? null}
-            onChat={setActiveAlarmChat}
+            onChat={openAlarmChat}
             fontLoaded={fontsLoaded}
           />
         </ScrollView>
       </SafeAreaView>
       {settingsOpen && (
         <SettingsDrawer
-          onCloseComplete={() => setSettingsOpen(false)}
+          onCloseComplete={() => { playUiSound("collapse"); setSettingsOpen(false); }}
+          onProfilePress={() => { setSettingsOpen(false); setAnnotationEditorOpen(true); }}
           fontLoaded={fontsLoaded}
         />
       )}
@@ -121,19 +162,38 @@ export function AurelianCalendarScreen() {
         />
       )}
       {activeAlarmChat && (
-        <View style={styles.alarmChatOverlay}>
+        <View style={[styles.alarmChatOverlay, !callAccepted && styles.backgroundChat]} pointerEvents={callAccepted ? "auto" : "none"}>
           <LiveKitChatScreen
             alarmId={activeAlarmChat.id}
             alarmTitle={activeAlarmChat.title}
             alarmGoal={activeAlarmChat.goal}
             autoStart
-            onError={(message) => {
-              setActiveAlarmChat(null);
-              setAlarmError(message);
-            }}
-            onBack={() => setActiveAlarmChat(null)}
+            callAccepted={callAccepted}
+            onIncomingCall={setIncomingCall}
+            onBack={closeAlarmChat}
+            annotationContext={annotationContext}
+            alarm={activeAlarmChat}
           />
         </View>
+      )}
+      {activeAlarmChat && incomingCall && (
+        <IncomingCallOverlay
+          callerName={activeAlarmChat.goal}
+          subtitle={activeAlarmChat.title}
+          onAccept={() => {
+            stopUiSoundLoop("incoming-call");
+            setIncomingCall(false);
+            setCallAccepted(true);
+          }}
+          onDecline={closeAlarmChat}
+        />
+      )}
+      {annotationEditorOpen && (
+        <BackgroundContextPage
+          value={annotationContext}
+          onClose={() => setAnnotationEditorOpen(false)}
+          onSaved={(next) => { setAnnotationContext(next); setAnnotationEditorOpen(false); }}
+        />
       )}
       </View>
     </View>
@@ -488,6 +548,7 @@ function AlarmsView({
           accessibilityLabel="Add alarm"
           style={({ pressed }) => [styles.addButton, pressed && styles.iconButtonPressed]}
           onPress={(event) => {
+            void unlockUiSounds().then(() => playUiSound("progress-step"));
             const target = event.currentTarget as unknown as HTMLElement;
             const rect = target?.getBoundingClientRect?.();
             if (rect) {
@@ -504,17 +565,6 @@ function AlarmsView({
         {isLoading && (
           <View style={[styles.alarmCard, styles.alarmMessageRow]}>
             <Text style={styles.alarmMessageText}>Loading alarms...</Text>
-          </View>
-        )}
-        {!isLoading && error && (
-          <View style={[styles.alarmCard, styles.alarmErrorContent]}>
-            <View style={styles.orangeErrorBadge}>
-              <Text style={styles.orangeErrorBadgeText}>!</Text>
-            </View>
-            <View style={styles.orangeErrorCopy}>
-              <Text style={styles.orangeErrorTitle}>Connection issue</Text>
-              <Text style={styles.alarmErrorText} numberOfLines={2}>{error}</Text>
-            </View>
           </View>
         )}
         {!isLoading && !error && alarms.length === 0 && (
@@ -571,12 +621,18 @@ function AlarmRow({
         <AlarmIconButton
           label={`Delete ${alarm.title}`}
           icon={(color) => <Text style={{ color, fontSize: 24, lineHeight: 24, fontWeight: "700" }}>×</Text>}
-          onPress={onDelete}
+          onPress={() => {
+            void unlockUiSounds().then(() => playUiSound("skip-previous"));
+            onDelete();
+          }}
         />
         <AlarmIconButton
           label={`Edit ${alarm.title}`}
           icon={(color) => <Pencil color={color} size={18} strokeWidth={2} />}
-          onPress={onEdit}
+          onPress={() => {
+            void unlockUiSounds().then(() => playUiSound("progress-step"));
+            onEdit();
+          }}
         />
         <AlarmIconButton
           label={`Enter chat for ${alarm.title}`}
@@ -741,6 +797,7 @@ function AlarmEditPage({
         await createAlarm(apiBaseUrl, input);
       }
       await onSaved();
+      playUiSound("success");
       close();
     } catch (error) {
       setSaveError(error instanceof Error ? error.message : String(error));
@@ -756,7 +813,10 @@ function AlarmEditPage({
           <Pressable
             accessibilityLabel="Back to alarms"
             style={({ pressed }) => [styles.alarmEditBackButton, pressed && styles.iconButtonPressed]}
-            onPress={close}
+            onPress={() => {
+              void unlockUiSounds().then(() => playUiSound("queued"));
+              close();
+            }}
           >
             <ArrowLeft color={colors.text} size={23} strokeWidth={2} />
           </Pressable>
@@ -923,9 +983,11 @@ function BottomNav({
 
 function SettingsDrawer({
   onCloseComplete,
+  onProfilePress,
   fontLoaded,
 }: {
   onCloseComplete: () => void;
+  onProfilePress: () => void;
   fontLoaded: boolean;
 }) {
   const { width } = useWindowDimensions();
@@ -981,7 +1043,7 @@ function SettingsDrawer({
           </View>
 
           <View style={styles.drawerNav}>
-            <DrawerNavItem icon="♙" label="Profile" active />
+            <DrawerNavItem icon="♙" label="Profile" active onPress={onProfilePress} />
             <DrawerNavItem icon="⚙" label="Preferences" />
             <DrawerNavItem icon="♢" label="Notification Settings" />
             <DrawerNavItem icon="◈" label="Privacy" />
@@ -1008,13 +1070,94 @@ function SettingsDrawer({
   );
 }
 
-function DrawerNavItem({ icon, label, active = false }: { icon: string; label: string; active?: boolean }) {
+function DrawerNavItem({ icon, label, active = false, onPress }: { icon: string; label: string; active?: boolean; onPress?: () => void }) {
   return (
-    <Pressable style={[styles.drawerNavItem, active && styles.drawerNavItemActive]}>
+    <Pressable style={[styles.drawerNavItem, active && styles.drawerNavItemActive]} onPress={onPress}>
       <Text style={[styles.drawerNavIcon, active && styles.drawerNavIconActive]}>{icon}</Text>
       <Text style={[styles.drawerNavText, active && styles.drawerNavTextActive]}>{label}</Text>
       <Text style={styles.drawerNavChevron}>›</Text>
     </Pressable>
+  );
+}
+
+function BackgroundContextPage({
+  value,
+  onClose,
+  onSaved,
+}: {
+  value: AnnotationContext;
+  onClose: () => void;
+  onSaved: (value: AnnotationContext) => void;
+}) {
+  const pageRef = useRef<View>(null);
+  const [draft, setDraft] = useState(value);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved] = useState(false);
+
+  useGSAP(() => {
+    if (Platform.OS !== "web" || !pageRef.current) return;
+    gsap.fromTo(pageRef.current, { clipPath: "circle(0% at 85% 8%)" }, { clipPath: "circle(150% at 85% 8%)", duration: 0.72, ease: "power3.out" });
+  }, { scope: pageRef });
+
+  const close = () => {
+    if (Platform.OS !== "web" || !pageRef.current) return onClose();
+    gsap.to(pageRef.current, { clipPath: "circle(0% at 85% 8%)", duration: 0.42, ease: "power3.in", onComplete: onClose });
+  };
+
+  const update = (key: keyof AnnotationContext, next: string) => setDraft((current) => ({ ...current, [key]: next }));
+  const save = async () => {
+    if (saving) return;
+    setSaving(true);
+    try {
+      await saveAnnotationContext(draft);
+      setSaved(true);
+      playUiSound("success");
+      setTimeout(() => onSaved(draft), 420);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <View ref={pageRef} style={styles.contextPage}>
+      <StatusBar style="dark" />
+      <SafeAreaView style={styles.contextSafeArea}>
+        <View style={styles.contextHeader}>
+          <Pressable accessibilityLabel="Back to settings" style={styles.alarmEditBackButton} onPress={close}>
+            <ArrowLeft color={colors.text} size={23} strokeWidth={2} />
+          </Pressable>
+          <Text style={styles.contextTitle}>Background context</Text>
+          <View style={styles.alarmEditHeaderSpacer} />
+        </View>
+        <ScrollView contentContainerStyle={styles.contextContent} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
+          <Text style={styles.contextIntro}>批注对象会在新的通话开始时作为背景提示注入。闹钟的标题、目标和简要上下文仍由各个闹钟单独管理。</Text>
+          <View style={styles.contextFieldGroup}><FloatingInput label="Current place or activity" value={draft.location} onChangeText={(text) => update("location", text)} maxLength={160} /></View>
+          <View style={styles.contextFieldGroup}><FloatingInput label="Coach name" value={draft.coachName} onChangeText={(text) => update("coachName", text)} maxLength={80} /></View>
+          <View style={styles.contextFieldGroup}>
+            <Text style={styles.contextFieldLabel}>Conversation language</Text>
+            <View style={styles.languagePicker}>
+              {(["中文", "EN"] as const).map((language) => (
+                <Pressable
+                  key={language}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected: draft.language === language }}
+                  accessibilityLabel={`Conversation language ${language}`}
+                  style={[styles.languageOption, draft.language === language && styles.languageOptionActive]}
+                  onPress={() => update("language", language)}
+                >
+                  <Text style={[styles.languageOptionText, draft.language === language && styles.languageOptionTextActive]}>{language}</Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+          <View style={styles.contextFieldGroup}><FloatingInput label="Preferred tone" value={draft.tone} onChangeText={(text) => update("tone", text)} maxLength={160} /></View>
+          <View style={styles.contextFieldGroup}><FloatingInput label="Personal notes" value={draft.personalNotes} onChangeText={(text) => update("personalNotes", text)} maxLength={1200} multiline style={styles.alarmEditPageTextArea} /></View>
+          <Pressable accessibilityLabel="Save background context" style={[styles.contextSaveButton, saved && styles.contextSaveButtonDone]} onPress={save} disabled={saving}>
+            <Text style={styles.contextSaveText}>{saved ? "Saved" : saving ? "Saving…" : "Save context"}</Text>
+          </Pressable>
+        </ScrollView>
+      </SafeAreaView>
+    </View>
   );
 }
 
@@ -1303,6 +1446,7 @@ const styles = StyleSheet.create({
   },
   root: {
     flex: 1,
+    position: "relative",
     backgroundColor: colors.background,
   },
   safeArea: {
@@ -1760,11 +1904,11 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   screenHeader: {
-    minHeight: 64,
+    minHeight: 88,
     flexDirection: "row",
     alignItems: "flex-end",
     justifyContent: "space-between",
-    marginBottom: 18,
+    marginBottom: 24,
   },
   screenTitle: {
     color: colors.text,
@@ -1776,6 +1920,8 @@ const styles = StyleSheet.create({
   },
   alarmScreenTitle: {
     color: colors.warningAccent,
+    fontSize: 60,
+    lineHeight: 68,
   },
   kalmanskText: {
     fontFamily: "Kalmansk",
@@ -1954,6 +2100,39 @@ const styles = StyleSheet.create({
     backgroundColor: colors.background,
     zIndex: 30,
   },
+  contextPage: {
+    position: "absolute",
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: colors.background,
+    zIndex: 35,
+  },
+  contextSafeArea: { flex: 1 },
+  contextHeader: {
+    minHeight: 78,
+    paddingHorizontal: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#faf9fe",
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: colors.divider,
+  },
+  contextTitle: { color: colors.text, fontSize: 21, lineHeight: 27, fontWeight: "700" },
+  contextContent: { paddingHorizontal: 24, paddingTop: 26, paddingBottom: 40, gap: 18 },
+  contextIntro: { color: colors.textMuted, fontSize: 14, lineHeight: 21, marginBottom: 4 },
+  contextFieldGroup: { gap: 8 },
+  contextFieldLabel: { color: colors.textMuted, fontSize: 13, lineHeight: 18, fontWeight: "700", marginLeft: 4 },
+  languagePicker: { minHeight: 56, borderRadius: 20, borderWidth: 2, borderColor: "rgb(200, 200, 200)", padding: 4, flexDirection: "row", gap: 4 },
+  languageOption: { flex: 1, borderRadius: 15, alignItems: "center", justifyContent: "center" },
+  languageOptionActive: { backgroundColor: colors.accent },
+  languageOptionText: { color: colors.textMuted, fontSize: 16, lineHeight: 22, fontWeight: "700" },
+  languageOptionTextActive: { color: colors.surface },
+  contextSaveButton: { minHeight: 56, borderRadius: 20, backgroundColor: colors.accent, alignItems: "center", justifyContent: "center", marginTop: 6 },
+  contextSaveButtonDone: { backgroundColor: "#4b8d68" },
+  contextSaveText: { color: colors.surface, fontSize: 17, lineHeight: 22, fontWeight: "800" },
   alarmChatOverlay: {
     position: "absolute",
     top: 0,
@@ -1961,6 +2140,9 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     zIndex: 40,
+  },
+  backgroundChat: {
+    opacity: 0,
   },
   alarmEditSafeArea: {
     flex: 1,

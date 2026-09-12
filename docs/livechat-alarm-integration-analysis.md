@@ -1,14 +1,16 @@
 # Livechat to Alarm Integration Analysis
 
-Date: 2026-07-31
+Date: 2026-09-12
+
+> 当前文档只描述 Web 端集成。原生 iOS/Android 客户端不在当前实现和验证范围内。
 
 ## Current Shape
 
-Chronos is a three-part scaffold:
+Chronos 当前是 Web + API + Agent 三部分：
 
-- Mobile: Expo + React Native, rendering a calendar-first shell in `mobile/App.tsx` and `mobile/src/screens/AurelianCalendarScreen.tsx`.
+- Web: Expo Web 日历和 Chat 覆盖层，Chat 实现位于 `mobile/src/screens/chat/LiveKitChatScreen.web.tsx`。
 - Server: FastAPI + SQLite, exposing calendar/event endpoints and a LiveKit token endpoint in `server/app/main.py`.
-- Agent: LiveKit Agents Python worker in `agent/main.py`, currently configured as a concise calendar assistant.
+- Agent: LiveKit Agents Python worker in `agent/main.py`，可使用 OpenAI Realtime 或 STT-LLM-TTS 管线。
 
 The current alarm screen is UI-only. `AlarmsView` renders a static local `alarms` array, and toggles are visual only. There is no alarm persistence endpoint, no alarm table, no link between alarms and calendar events, and no call to `AlarmKit.scheduleAlarm`.
 
@@ -20,17 +22,20 @@ The current AlarmKit integration is an interface wrapper only. `mobile/src/nativ
 
 On non-iOS or without the native bridge, scheduling throws.
 
-The current LiveKit integration is partially scaffolded. The mobile service can request a token from `/livekit/token`; the server can sign a token; the agent can join a LiveKit room. There is no mobile room/chat screen yet.
+The current Web LiveKit integration is connected at the transport layer. The Web client requests a token, joins a unique
+LiveKit room, publishes browser microphone audio, subscribes to Agent audio, receives challenge data events, and renders
+the Chat overlay. Realtime conversation and tool execution still require a real-room acceptance test for final transcript
+and tool-loop evidence.
 
 ## Evidence
 
 - `mobile/src/screens/AurelianCalendarScreen.tsx:38` defines static alarm data.
 - `mobile/src/screens/AurelianCalendarScreen.tsx:397` renders the alarm list from that static data.
 - `mobile/src/native/alarmkit.ts:16` falls back when the iOS native bridge is absent.
-- `mobile/src/services/livekit.ts:14` requests LiveKit room credentials.
+- `mobile/src/services/livekit.ts:30` requests LiveKit room credentials.
 - `server/app/main.py:124` exposes `/livekit/token`.
 - `server/app/livekit_service.py:23` creates a LiveKit access token with publish, subscribe, and data permissions.
-- `agent/main.py:15` defines `ChronosAgent`.
+- `agent/main.py:130` defines `ChronosAgent`; `agent/main.py:85` and `agent/main.py:117` define challenge tools.
 - `server/app/calendar_service.py:99` persists calendar events to `timeline_items`.
 - `server/app/calendar_service.py:252` maps `timeline_items` rows into mobile `CalendarEvent` payloads.
 - `server/app/db.py:41` creates `timeline_items`, but no alarm table.
@@ -41,14 +46,14 @@ Livechat should connect to the alarm feature through the agent and server, not d
 
 The recommended path is:
 
-1. Mobile opens a LiveKit conversation from the Alarms tab.
-2. Mobile requests `/livekit/token` and joins a room.
+1. Web opens a LiveKit conversation from the Alarms tab.
+2. Web requests `/livekit/token` and joins a room.
 3. The LiveKit agent receives user intent, for example "wake me 20 minutes before my 8 AM meeting".
 4. The agent calls server-side tools such as `list_events`, `create_alarm`, `update_alarm`, or `cancel_alarm`.
 5. The server persists alarm records and returns an alarm command payload.
-6. Mobile syncs alarm records and calls `AlarmKit.scheduleAlarm` locally on iOS.
+6. Web displays the server result. Native AlarmKit scheduling is outside the current Web-only scope.
 
-AlarmKit scheduling should remain mobile-local because iOS alarm authorization and native scheduling live on device. The server should store intent/state; the client should be the executor for native alarms.
+The server remains the source of truth for alarm and challenge intent. Native AlarmKit scheduling is outside the current Web-only architecture.
 
 ## Data Model Gap
 
@@ -97,37 +102,38 @@ Minimal useful tools:
 
 These tools should call the FastAPI server or directly share a small service module with it. Prefer HTTP calls first because it preserves one backend API contract for mobile, agent, and tests.
 
-## Mobile Changes
+## Web Changes
 
-The mobile app needs three pieces:
+The Web app needs three pieces:
 
 1. Alarm service:
    - fetch alarm list
    - create/update/delete alarms
-   - sync persisted alarm records into AlarmKit
+   - keep Web fallback state in sync with the API
 
 2. Alarm UI:
    - replace static `alarms` array with fetched data
-   - make toggles call update + schedule/cancel
+   - make toggles call update endpoints
    - add a "talk/chat" entry point in the Alarms tab
 
 3. LiveKit room:
    - request token with `requestLiveKitToken`
-   - join a LiveKit room using `@livekit/react-native`
-   - support voice first; optionally add data/RPC for structured "schedule this alarm" commands
+   - join a LiveKit room using `livekit-client`
+   - receive structured challenge events through `DataReceived`
 
 ## Critical Sync Rule
 
-The safest source of truth split is:
+The safest source of truth split for the Web target is:
 
 - Server: alarm intent, enabled state, event linkage, smart rules.
-- Mobile: native alarm scheduling state and returned `native_alarm_id`.
+- Web: displayed alarm state and API response state.
 
-When the server creates or updates an enabled alarm, the mobile app should schedule it locally and PATCH back the `native_alarm_id`. If native scheduling fails, mobile should mark the alarm as `sync_status = failed` or keep a local error state visible in the Alarms tab.
+When the server creates or updates an alarm, the Web client should refresh its API-backed state and keep submission or
+transport failures visible in the Alarms tab.
 
 ## Risks
 
-- iOS-only AlarmKit: Android and web need fallback behavior.
+- Native AlarmKit is outside the Web-only target.
 - Authorization: `requestAuthorization()` must be called before scheduling; denial must be represented in UI and API sync state.
 - Agent hallucination risk: the agent must use typed tools and return structured commands, not free-form "I scheduled it" text.
 - Time zones: `fire_at` should be ISO with offset or UTC plus a user timezone field.
@@ -137,13 +143,12 @@ When the server creates or updates an enabled alarm, the mobile app should sched
 ## Implementation Order
 
 1. Add server alarm model, service, and REST endpoints.
-2. Add mobile alarm service and replace static alarm data.
-3. Implement iOS `AlarmKitBridge` on macOS/Xcode.
-4. Add LiveKit room UI entry from Alarms tab.
+2. Add Web alarm service and replace static alarm data.
+3. Keep the LiveKit room UI entry in the Web Alarms tab.
 5. Add agent function tools that create/update/cancel alarms through the server API.
-6. Add structured result events from agent to mobile so the app can schedule native AlarmKit alarms.
-7. Add tests for alarm CRUD, tool validation, and mobile scheduling failure states.
+6. Add structured result events from Agent to the Web client.
+7. Add tests for alarm CRUD, tool validation, and Web submission/error states.
 
 ## Decision
 
-Livechat is feasible to connect to the alarm section with the existing stack, but the current project is only about one layer deep into that integration. The best next engineering move is not to wire LiveKit directly into `AlarmKit.scheduleAlarm`; it is to introduce a server-backed alarm domain first, then let LiveKit agent tools write alarm intent and let the mobile client execute native scheduling.
+Web Livechat is connected to the alarm section at the room, Agent, API, and challenge-event layers. The remaining work is acceptance testing and observability for transcript/tool loops, followed by completing server-backed alarm CRUD and structured Web state updates. Native AlarmKit scheduling is intentionally outside this Web-only architecture.

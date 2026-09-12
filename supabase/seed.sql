@@ -1,1 +1,0 @@
--- Seed intentionally contains no users or personal data. Auth users create their own rows via trigger.

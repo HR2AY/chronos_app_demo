@@ -2,6 +2,8 @@
 
 > 本地启动请先看 [STARTUP.md](./STARTUP.md)。其中记录了 Web、API、Agent 的端口、环境变量和启动顺序。
 
+当前阶段以 Web 前端设计为主，具体范围和实施顺序见 [前端设计阶段规划](./docs/frontend-design-plan.md)。
+
 Monorepo for a calendar-first mobile app with LiveKit voice support and an iOS AlarmKit bridge.
 
 ## Layout
@@ -25,6 +27,10 @@ Monorepo for a calendar-first mobile app with LiveKit voice support and an iOS A
 - A LiveKit Agents worker
 
 ## Local setup
+
+### Visual launcher
+
+On Windows, double-click `start_launcher.bat` in the project root to open the Chronos launcher. It can start and stop the Web, API, and Realtime Agent services independently or together, while showing live logs and service health. The same launcher can be started with `python launcher.py`.
 
 ### 1. Mobile app
 

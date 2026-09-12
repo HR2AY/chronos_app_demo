@@ -23,7 +23,10 @@ import {
   View,
 } from "react-native";
 import { AgentAudioVisualizerAura, type AuraAgentState } from "../../components/AgentAudioVisualizerAura";
+import { IncomingCallOverlay } from "../../components/IncomingCallOverlay";
 import { requestLiveKitToken, type LiveKitTokenResponse } from "../../services/livekit";
+import type { AnnotationContext } from "../../services/annotationContext";
+import type { Alarm } from "../../services/alarms";
 
 type SessionPhase = "idle" | "requesting" | "connecting" | "active" | "ended" | "error";
 
@@ -40,19 +43,26 @@ export type LiveKitChatScreenProps = {
   onError?: (message: string) => void;
   alarmId?: string;
   autoStart?: boolean;
+  callAccepted?: boolean;
+  onIncomingCall?: (incoming: boolean) => void;
   alarmTitle?: string;
   alarmGoal?: string;
+  annotationContext?: AnnotationContext;
+  alarm?: Alarm;
 };
 
-export function LiveKitChatScreen({ onBack, onError, alarmId, autoStart = false, alarmTitle, alarmGoal }: LiveKitChatScreenProps) {
+export function LiveKitChatScreen({ onBack, onError, alarmId, autoStart = false, callAccepted: acceptedProp, onIncomingCall, alarmTitle, alarmGoal, annotationContext, alarm }: LiveKitChatScreenProps) {
   const config = useMemo(readChatConfig, []);
   const [phase, setPhase] = useState<SessionPhase>("idle");
   const [credentials, setCredentials] = useState<LiveKitTokenResponse | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [incomingCall, setIncomingCall] = useState(false);
+  const [callAccepted, setCallAccepted] = useState(false);
   const requestId = useRef(0);
   const disconnectPhase = useRef<SessionPhase>("ended");
   const autoStarted = useRef(false);
   const stoppingRef = useRef(false);
+  const accepted = acceptedProp ?? callAccepted;
 
   const stopSession = useCallback(async (nextPhase: SessionPhase = "ended") => {
     if (stoppingRef.current) return;
@@ -60,6 +70,9 @@ export function LiveKitChatScreen({ onBack, onError, alarmId, autoStart = false,
     requestId.current += 1;
     disconnectPhase.current = nextPhase;
     setCredentials(null);
+    setIncomingCall(false);
+    setCallAccepted(false);
+    onIncomingCall?.(false);
     setPhase(nextPhase);
     if (Platform.OS !== "web") {
       await AudioSession.stopAudioSession().catch(() => undefined);
@@ -85,6 +98,9 @@ export function LiveKitChatScreen({ onBack, onError, alarmId, autoStart = false,
     requestId.current = currentRequest;
     stoppingRef.current = false;
     setError(null);
+    setIncomingCall(!onIncomingCall);
+    setCallAccepted(false);
+    onIncomingCall?.(true);
     disconnectPhase.current = "ended";
     setPhase("requesting");
 
@@ -97,8 +113,14 @@ export function LiveKitChatScreen({ onBack, onError, alarmId, autoStart = false,
         participantIdentity: `chronos-member-${suffix}`,
         alarmId,
         sessionContext: {
-          location: config.location,
-          coachName: config.coachName,
+          location: annotationContext?.location ?? config.location,
+          coachName: annotationContext?.coachName ?? config.coachName,
+          annotation: annotationContext ? {
+            language: annotationContext.language,
+            tone: annotationContext.tone,
+            personalNotes: annotationContext.personalNotes,
+          } : undefined,
+          alarm,
         },
       });
       if (requestId.current !== currentRequest) return;
@@ -109,9 +131,10 @@ export function LiveKitChatScreen({ onBack, onError, alarmId, autoStart = false,
       await AudioSession.stopAudioSession().catch(() => undefined);
       setError(readError(caughtError));
       onError?.(readError(caughtError));
+      setIncomingCall(false);
       setPhase("error");
     }
-  }, [alarmId, config, onError]);
+  }, [alarmId, config, onError, annotationContext, alarm]);
 
   useEffect(() => {
     if (!autoStart || autoStarted.current) return;
@@ -123,13 +146,22 @@ export function LiveKitChatScreen({ onBack, onError, alarmId, autoStart = false,
     void stopSession("idle").then(() => onBack?.());
   }, [onBack, stopSession]);
 
+  const acceptCall = useCallback(() => {
+    setIncomingCall(false);
+    setCallAccepted(true);
+  }, []);
+
+  const declineCall = useCallback(() => {
+    void stopSession("idle").then(() => onBack?.());
+  }, [onBack, stopSession]);
+
   if (credentials) {
     return (
       <LiveKitRoom
         serverUrl={credentials.server_url}
         token={credentials.participant_token}
         connect
-        audio
+        audio={accepted}
         video={false}
         onConnected={() => setPhase("active")}
         onDisconnected={() => void stopSession(disconnectPhase.current)}
@@ -146,6 +178,9 @@ export function LiveKitChatScreen({ onBack, onError, alarmId, autoStart = false,
           alarmGoal={alarmGoal}
           phase={phase}
           error={error}
+          incomingCall={onIncomingCall ? false : incomingCall}
+          onAcceptCall={acceptCall}
+          onDeclineCall={declineCall}
           onBack={handleBack}
           onEnded={() => void stopSession("ended").then(() => onBack?.())}
         />
@@ -162,6 +197,9 @@ export function LiveKitChatScreen({ onBack, onError, alarmId, autoStart = false,
       agentState="disconnected"
       transcriptLines={[]}
       error={error}
+      incomingCall={onIncomingCall ? false : incomingCall}
+      onAcceptCall={acceptCall}
+      onDeclineCall={declineCall}
       microphoneEnabled={false}
       onBack={handleBack}
       onEnd={() => void stopSession("ended").then(() => onBack?.())}
@@ -176,6 +214,9 @@ function ConnectedCoachView({
   alarmGoal,
   phase,
   error,
+  incomingCall,
+  onAcceptCall,
+  onDeclineCall,
   onBack,
   onEnded,
 }: {
@@ -184,6 +225,9 @@ function ConnectedCoachView({
   alarmGoal?: string;
   phase: SessionPhase;
   error: string | null;
+  incomingCall: boolean;
+  onAcceptCall: () => void;
+  onDeclineCall: () => void;
   onBack: () => void;
   onEnded: () => void;
 }) {
@@ -235,6 +279,9 @@ function ConnectedCoachView({
       audioTrack={audioTrack}
       transcriptLines={transcriptLines}
       error={error}
+      incomingCall={incomingCall}
+      onAcceptCall={onAcceptCall}
+      onDeclineCall={onDeclineCall}
       microphoneEnabled={isMicrophoneEnabled}
       onBack={onBack}
       onEnd={endCall}
@@ -252,6 +299,9 @@ function CoachLayout({
   audioTrack,
   transcriptLines,
   error,
+  incomingCall,
+  onAcceptCall,
+  onDeclineCall,
   microphoneEnabled,
   onBack,
   onEnd,
@@ -265,6 +315,9 @@ function CoachLayout({
   audioTrack?: unknown;
   transcriptLines: string[];
   error: string | null;
+  incomingCall: boolean;
+  onAcceptCall: () => void;
+  onDeclineCall: () => void;
   microphoneEnabled: boolean;
   onBack: () => void;
   onEnd: () => void;
@@ -351,8 +404,9 @@ function CoachLayout({
             </RoundButton>
           </View>
         </View>
-      </SafeAreaView>
-    </View>
+    </SafeAreaView>
+    {incomingCall && <IncomingCallOverlay callerName={alarmGoal ?? config.coachName} subtitle={alarmTitle ?? config.location} onAccept={onAcceptCall} onDecline={onDeclineCall} />}
+  </View>
   );
 }
 
@@ -396,7 +450,7 @@ function readChatConfig(): ChatConfig {
   return {
     apiBaseUrl: String(extra.apiBaseUrl ?? "http://127.0.0.1:8000"),
     roomPrefix: String(extra.livekitRoomName ?? "chronos-coach"),
-    location: String(extra.chatLocation ?? "徐汇体育馆游泳"),
+    location: String(extra.chatLocation ?? ""),
     coachName: String(extra.chatCoachName ?? "Chronos教练"),
     statusText: String(extra.chatStatusText ?? "（更新了记忆）"),
   };
